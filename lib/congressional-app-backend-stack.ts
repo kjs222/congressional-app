@@ -5,30 +5,20 @@ import * as lambda from "aws-cdk-lib/aws-lambda-nodejs";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as eventBridge from "aws-cdk-lib/aws-events";
 import * as targets from "aws-cdk-lib/aws-events-targets";
+import * as secrets from "aws-cdk-lib/aws-secretsmanager";
 
 export class CongressionalAppBackendStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
-    // table to track last processed batch
-    const batchTable = new dynamo.Table(
-      this,
-      "congressDataCollectorLastBatch",
-      {
-        partitionKey: { name: "last", type: dynamo.AttributeType.STRING },
-        sortKey: { name: "batchId", type: dynamo.AttributeType.STRING },
-        tableName: "congressDataCollectorLastBatch",
-        removalPolicy: cdk.RemovalPolicy.DESTROY,
-      }
-    );
 
-    // table to store raw vote information
+    // table to store raw vote information from data collector
     const rawVotesTable = new dynamo.Table(
       this,
       "congressDataCollectorRawVotes",
       {
-        partitionKey: { name: "batchId", type: dynamo.AttributeType.STRING },
-        sortKey: { name: "voteId", type: dynamo.AttributeType.STRING },
-        tableName: "congressDataCollectorRawVotes",
+        partitionKey: { name: "part", type: dynamo.AttributeType.STRING },
+        sortKey: { name: "sort", type: dynamo.AttributeType.STRING },
+        tableName: "congressDataCollectorRaw",
         removalPolicy: cdk.RemovalPolicy.DESTROY,
       }
     );
@@ -43,6 +33,14 @@ export class CongressionalAppBackendStack extends cdk.Stack {
       }
     );
 
+    const proPublicaApiSecret = new secrets.Secret(
+      this,
+      "proPublicaApiSecret",
+      {
+        secretName: "proPublicaApiSecret",
+      }
+    );
+
     const congressDataCollectorLambda = new lambda.NodejsFunction(
       this,
       "congressDataCollectorLambda",
@@ -50,18 +48,17 @@ export class CongressionalAppBackendStack extends cdk.Stack {
         entry: "./backend/handlers/data-collector.ts",
         handler: "handler",
         environment: {
-          BATCH_TABLE_NAME: batchTable.tableName,
           RAW_VOTES_TABLE_NAME: rawVotesTable.tableName,
+          PRO_PUBLICA_API_KEY_SECRET_ARN: proPublicaApiSecret.secretArn,
         },
         initialPolicy: [
           new iam.PolicyStatement({
             actions: ["dynamodb:GetItem", "dynamodb:PutItem"],
-            resources: [
-              batchTable.tableArn,
-              // batchTable.tableArn + "/index/*",
-              rawVotesTable.tableArn,
-              // rawVotesTable.tableArn + "/index/*",
-            ],
+            resources: [rawVotesTable.tableArn],
+          }),
+          new iam.PolicyStatement({
+            actions: ["secretsmanager:GetSecretValue"],
+            resources: [proPublicaApiSecret.secretArn],
           }),
         ],
       }

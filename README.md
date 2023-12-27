@@ -32,9 +32,10 @@ npx cdk deploy CongressionalAppBackendStack
 
 ### Todo
 
-- confirm event bridge triggers event - may move it to once every 5 mins to test
-- confirm lambda can read/write to ddb tables
-- try to set up local stack for ddb access - and document y
+- test datafetcher api (use zod create random)
+- add typing to the DB in/out layer
+- test db repository
+- write service layer for data collector
 
 ### To run locally
 
