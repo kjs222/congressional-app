@@ -14,6 +14,7 @@
     "@aws-sdk/client-dynamodb": "^3.478.0",
     "@aws-sdk/client-secrets-manager": "^3.481.0",
     "@aws-sdk/lib-dynamodb": "^3.478.0",
+    "@aws-sdk/util-dynamodb": "^3.481.0",
     "@types/jest": "^29.5.11",
     "@types/node": "20.10.4",
     "@typescript-eslint/eslint-plugin": "^6.14.0",

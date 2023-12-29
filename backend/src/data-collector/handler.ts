@@ -2,9 +2,9 @@ import {
   SecretsManagerClient,
   GetSecretValueCommand,
 } from "@aws-sdk/client-secrets-manager";
-import { DynamoRawDataRepository } from "../data-collector/adapters/dynamo-raw-data-repository";
-import { ProPublicaVoteFetcher } from "../data-collector/adapters/propublica-vote-fetcher";
-import { collectAndSaveData } from "../data-collector/services/data-collection-service";
+import { DynamoRawDataRepository } from "./adapters/dynamo-raw-data-repository";
+import { ProPublicaVoteFetcher } from "./adapters/propublica-vote-fetcher";
+import { collectAndSaveData } from "./services/data-collection-service";
 
 export const handler = async (event: any = {}): Promise<any> => {
   const apiKey = await getAPIKeyFromSecretsManager();

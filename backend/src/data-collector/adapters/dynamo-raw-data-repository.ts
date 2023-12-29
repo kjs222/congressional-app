@@ -20,24 +20,26 @@ export class DynamoRawDataRepository implements RawDataRepository {
           Item: {
             part: { S: input.batchId },
             sort: { S: `${input.chamber}-${input.rollCall.toString()}` },
-            raw: { M: input.rawVote },
+            raw: { S: JSON.stringify(input.rawVote) },
           },
         },
       };
     });
+
     const batches = [];
     while (putRequestArray.length > 0) {
-      batches.push(putRequestArray.splice(0, 25));
+      batches.push(putRequestArray.splice(0, 15));
     }
 
     for (const batch of batches) {
       const command = new BatchWriteItemCommand({
         RequestItems: {
-          [this.tableName]: batch,
+          congressDataCollectorRaw: batch,
         },
       });
       const response = await this.docClient.send(command);
       console.log(JSON.stringify(response));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
     }
     return;
   }
@@ -51,11 +53,11 @@ export class DynamoRawDataRepository implements RawDataRepository {
     const command = new PutCommand({
       TableName: this.tableName,
       Item: {
-        part: { S: "last" },
-        sort: { S: chamber },
-        rollCall: { N: Number(rollCall) },
-        date: { S: date },
-        batchId: { S: batchId },
+        part: "last",
+        sort: chamber,
+        rollCall: rollCall,
+        date,
+        batchId,
       },
     });
     const response = await this.docClient.send(command);
@@ -74,8 +76,6 @@ export class DynamoRawDataRepository implements RawDataRepository {
       },
     });
     const response = await this.docClient.send(command);
-    console.log(JSON.stringify(response));
-
     const item = response.Item;
 
     if (!item) return null;
@@ -86,7 +86,7 @@ export class DynamoRawDataRepository implements RawDataRepository {
       return {
         date: parsed.data.date.S,
         batchId: parsed.data.batchId.S,
-        rollCall: parsed.data.rollCall.N,
+        rollCall: Number(parsed.data.rollCall.N),
         chamber,
       };
     } else {

@@ -16,7 +16,7 @@ export const collectAndSaveData = async (
     repo,
     fetcher
   );
-  console.log(`Collected ${houseVotes} house votes`);
+  console.log(`Processed ${houseVotes} house votes`);
   console.log("Collecting senate votes");
   const senateVotes = await collectAndSaveDataForChamber(
     batchId,
@@ -24,7 +24,7 @@ export const collectAndSaveData = async (
     repo,
     fetcher
   );
-  console.log(`Collected ${senateVotes} senate votes`);
+  console.log(`Processed ${senateVotes} senate votes`);
 };
 
 const collectAndSaveDataForChamber = async (
@@ -39,9 +39,9 @@ const collectAndSaveDataForChamber = async (
     lastVoteReceived,
     fetcher
   );
+  console.log(`Found ${recentVoteData.length} new votes for ${chamber}`);
   if (recentVoteData.length === 0) return null;
   const { roll_call, date } = recentVoteData[recentVoteData.length - 1];
-  await repo.saveLastVoteReceived(batchId, chamber, roll_call, date);
   const votes = await batchGetVotes(recentVoteData, fetcher);
   const rawVoteInputs = votes.map((vote) => {
     return {
@@ -51,7 +51,10 @@ const collectAndSaveDataForChamber = async (
       rawVote: vote.votes.vote,
     };
   });
+  console.log(`Saving ${rawVoteInputs.length} votes for ${chamber}`);
   await repo.saveRawVotes(rawVoteInputs);
+  console.log(`Saving last vote received for ${chamber}`);
+  await repo.saveLastVoteReceived(batchId, chamber, roll_call, date);
   return votes.length;
 };
 
@@ -64,7 +67,10 @@ const getRecentVoteData = async (
   let foundLastVote = false;
   const newVotes: RecentVote[] = [];
   while (!foundLastVote) {
-    const recentVotes = await fetcher.getRecentVotes(chamber);
+    const recentVotes = await fetcher.getRecentVotes(
+      chamber,
+      numReceived || undefined
+    );
     numReceived = numReceived + recentVotes.votes.length;
     recentVotes.votes.forEach((vote: RecentVote) => {
       const isLastVote =
