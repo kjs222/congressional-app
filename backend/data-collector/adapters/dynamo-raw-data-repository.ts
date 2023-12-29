@@ -11,7 +11,7 @@ import { ddbLatestSchema } from "../../types/ddb-schemas";
 export class DynamoRawDataRepository implements RawDataRepository {
   private readonly client = new DynamoDBClient({ region: "us-east-1" });
   private readonly docClient = DynamoDBDocumentClient.from(this.client);
-  private readonly tableName = "congressDataCollectorRawVotes";
+  private readonly tableName = "congressDataCollectorRaw";
 
   async saveRawVotes(rawVoteInput: RawVoteInput[]): Promise<any> {
     const putRequestArray = rawVoteInput.map((input) => {

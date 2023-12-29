@@ -53,7 +53,11 @@ export class CongressionalAppBackendStack extends cdk.Stack {
         },
         initialPolicy: [
           new iam.PolicyStatement({
-            actions: ["dynamodb:GetItem", "dynamodb:PutItem"],
+            actions: [
+              "dynamodb:GetItem",
+              "dynamodb:PutItem",
+              "dynamodb:BatchWriteItem",
+            ],
             resources: [rawVotesTable.tableArn],
           }),
           new iam.PolicyStatement({
