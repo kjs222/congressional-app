@@ -1,108 +1,66 @@
-# Welcome to your CDK TypeScript project
+### Data Collector
 
-This is a blank project for CDK development with TypeScript.
+The data collector is deployed on AWS and functioning in production. It is collecting data every night and persisting the data in the data store.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+The architecture of the Data Collector is as follows:
 
-## Useful commands
+- Data Store:
+  - DynamoDB (no SQL/schema-less database)
+- Runtime:
+  - AWS Lambda (serverless)
+  - Typescript/Node
+- Trigger:
+  - AWS Event Bridge scheduled event (10pm MT every evening)
 
-- `npm run build` compile typescript to js
-- `npm run watch` watch for changes and compile
-- `npm run test` perform the jest unit tests
-- `npx cdk deploy` deploy this stack to your default AWS account/region
-- `npx cdk diff` compare deployed stack with current state
-- `npx cdk synth` emits the synthesized CloudFormation template
+### Datastore
 
-### Manual Frontend Deploy
-
-```
-cd frontend
-npm run build
-cd ..
-npx cdk deploy CongressionalAppFrontendStack
-```
-
-front end accessible at: http://kjs222-congressional-application.s3-website-us-east-1.amazonaws.com/
-
-### Manual Backend Deploy
+The datastore for the data collector is created in `lib/congressional-app-backend-stack.ts` (code excerpted below). There is no schema other than a requirement to set up a partition and sort key:
 
 ```
-npx cdk deploy CongressionalAppBackendStack
+    const rawVotesTable = new dynamo.Table(
+      this,
+      "congressDataCollectorRawVotes",
+      {
+        partitionKey: { name: "part", type: dynamo.AttributeType.STRING },
+        sortKey: { name: "sort", type: dynamo.AttributeType.STRING },
+        tableName: "congressDataCollectorRaw",
+        removalPolicy: cdk.RemovalPolicy.DESTROY,
+        // change below to billingMode: dynamo.BillingMode.PAY_PER_REQUEST
+        readCapacity: 25,
+        writeCapacity: 25,
+      }
+    );
 ```
 
-### Todo
+This table is used to persist two types of data:
 
-- test datafetcher api (use zod create random)
-- add typing to the DB in/out layer
-- test db repository
-- write service layer for data collector
+1. a marker of the last vote processed so I know where to "end" on the following day
+2. raw vote data for processing by the data analyzer (not built yet)
 
-### To run locally
+Again, there is no schema for a dynamoDB table, so the best that I can show is the shape of the data I am inserting. See `backend/src/data-collector/adapters/dynamo-raw-data-repository.ts`
 
-#### dependencies
-
-install awscli-local:
+The shape of the data for #1 above is:
 
 ```
-brew install awscli-local
+  part: string,
+  sort: string,
+  rollCall: number,
+  date: string
+  batchId: string
 ```
 
-```
-npm install -g aws-cdk-local aws-cdk
-```
-
-install sam
-https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html
-
-### running locally
-
-in one terminal
+THe shape of the data for #2 above is:
 
 ```
-cd backend
-docker-compose up
+  part: string,
+  sort: string,
+  raw: string
 ```
 
-in another terminal, back at root
+### API for Data collection
 
-```
-cdklocal deploy CongressionalAppBackendStack
-```
+The API for data collection is ProPublica's Congressional API. This requires an API key that I am not exposing (it is saved in AWS Secrets Manager).
 
-The first time that runs, you will get an error
-Deployment failed: Error: CongressionalAppBackendStack: SSM parameter /cdk-bootstrap/hnb659fds/version not found...
+The data fetcher is: `backend/src/data-collector/adapters/propublica-vote-fetcher.ts`
 
-if you get that
-
-```
-cdklocal bootstrap
-```
-
-run this again
-
-```
-cdklocal deploy CongressionalAppBackendStack
-```
-
-to make sure it's all connected
-
-```
-awslocal dynamodb list-tables
-```
-
-should see output of tables from our cdk
-
-to invoke lambdal
-
-```
-sam local invoke -t cdk.out/CongressionalAppBackendStack.template.json
-```
-
-not sure how it knows what lambda to invoke if there are many
-
-if i wanted to pass an event i could do sam local invoke -t cdk.out/CongressionalAppBackendStack.template.json -e <path to json even file>
-
-```
-npx cdk synth CongressionalAppBackendStack
-sam local invoke -t cdk.out/CongressionalAppBackendStack.template.json
-```
+And the service that orchestrates the fetching and saving of the data is: `backend/src/data-collector/services/data-collection-service.ts`
