@@ -1,9 +1,19 @@
+import { Chamber, LastVoteReceived } from "../../types";
+
 export interface RawDataRepository {
-  saveRawVote(batchId: string, rollCall: number, rawVote: any): Promise<any>;
+  saveRawVotes(rawVotes: RawVoteInput[]): Promise<any>;
   saveLastVoteReceived(
     batchId: string,
-    chamber: string,
+    chamber: Chamber,
     rollCall: number,
     date: string
   ): Promise<any>;
+  getLastVoteReceived(chamber: Chamber): Promise<LastVoteReceived | null>;
+}
+
+export interface RawVoteInput {
+  batchId: string;
+  chamber: Chamber;
+  rollCall: number;
+  rawVote: any;
 }

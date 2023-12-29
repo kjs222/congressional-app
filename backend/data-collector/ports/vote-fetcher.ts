@@ -1,7 +1,13 @@
-import { RecentVotes, VoteResult } from "../../types/propublica-schemas";
+import {
+  RecentVotesResponse,
+  VoteResult,
+} from "../../types/propublica-schemas";
 
 export interface VoteFetcher {
-  getRecentVotes(chamber: string, offset?: number): Promise<RecentVotes>;
+  getRecentVotes(
+    chamber: string,
+    offset?: number
+  ): Promise<RecentVotesResponse>;
   getVote(
     congress: number,
     chamber: string,

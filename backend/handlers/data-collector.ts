@@ -1,22 +1,35 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { PutCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import {
+  SecretsManagerClient,
+  GetSecretValueCommand,
+} from "@aws-sdk/client-secrets-manager";
+import { DynamoRawDataRepository } from "../data-collector/adapters/dynamo-raw-data-repository";
+import { ProPublicaVoteFetcher } from "../data-collector/adapters/propublica-vote-fetcher";
+import { collectAndSaveData } from "../data-collector/services/data-collection-service";
 
 export const handler = async (event: any = {}): Promise<any> => {
-  console.log(event);
-  const client = new DynamoDBClient({ region: "us-east-1" });
-  const command = new PutCommand({
-    // TableName: process.env.RAW_VOTES_TABLE_NAME || "",
-    TableName: "congressDataCollectorRawVotes",
-    Item: {
-      batchId: "testBatchId",
-      voteId: "testVoteId",
-      rawVote: JSON.stringify({ hi: "hello" }),
-    },
+  const apiKey = await getAPIKeyFromSecretsManager();
+  const repo = new DynamoRawDataRepository();
+  const fetcher = new ProPublicaVoteFetcher(apiKey);
+  try {
+    await collectAndSaveData(repo, fetcher);
+    return { statusCode: 200 };
+  } catch (error) {
+    console.log(error);
+    return { statusCode: 500 };
+  }
+};
+
+const getAPIKeyFromSecretsManager = async (): Promise<string> => {
+  const secretArn = process.env.PRO_PUBLICA_API_KEY_SECRET_ARN!;
+  const secretsManagerClient = new SecretsManagerClient({
+    region: "us-east-1",
   });
 
-  const docClient = DynamoDBDocumentClient.from(client);
-  const response = await docClient.send(command);
-  console.log(response);
+  const getSecretValueCommand = new GetSecretValueCommand({
+    SecretId: secretArn,
+  });
 
-  return { message: "hello world" };
+  const result = await secretsManagerClient.send(getSecretValueCommand);
+
+  return result.SecretString!;
 };

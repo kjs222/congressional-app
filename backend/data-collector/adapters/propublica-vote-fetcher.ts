@@ -2,10 +2,11 @@ import * as axios from "axios";
 import {
   propublicaRecentVotesSchema,
   propublicaVoteResultSchema,
-  RecentVotes,
+  RecentVotesResponse,
   VoteResult,
 } from "../../types/propublica-schemas";
 import { VoteFetcher } from "../ports/vote-fetcher";
+import { Chamber } from "../../types";
 
 export class ProPublicaVoteFetcher implements VoteFetcher {
   private readonly _apiKey: string;
@@ -24,7 +25,7 @@ export class ProPublicaVoteFetcher implements VoteFetcher {
   async getRecentVotes(
     chamber: string,
     offset: number = 0
-  ): Promise<RecentVotes> {
+  ): Promise<RecentVotesResponse> {
     const query = offset ? `?offset=${offset}` : "";
     const response = await this._axios.get(
       `${chamber}/votes/recent.json${query}`
@@ -35,7 +36,7 @@ export class ProPublicaVoteFetcher implements VoteFetcher {
 
   async getVote(
     congress: number,
-    chamber: string,
+    chamber: Chamber,
     session: number,
     rollCall: number
   ): Promise<VoteResult> {

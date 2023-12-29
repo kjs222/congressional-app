@@ -68,5 +68,7 @@ export const propublicaVoteResultSchema = z.object({
   }),
 });
 
-export type RecentVotes = z.infer<typeof propublicaRecentVotesSchema>;
+export type RecentVotesResponse = z.infer<typeof propublicaRecentVotesSchema>;
+export type RecentVote = z.infer<typeof propublicaVoteSchema>;
+
 export type VoteResult = z.infer<typeof propublicaVoteResultSchema>;
