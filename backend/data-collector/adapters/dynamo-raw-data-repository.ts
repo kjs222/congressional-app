@@ -51,11 +51,11 @@ export class DynamoRawDataRepository implements RawDataRepository {
     const command = new PutCommand({
       TableName: this.tableName,
       Item: {
-        part: "last",
-        sort: chamber,
-        rollCall: rollCall,
-        date,
-        batchId,
+        part: { S: "last" },
+        sort: { S: chamber },
+        rollCall: { N: Number(rollCall) },
+        date: { S: date },
+        batchId: { S: batchId },
       },
     });
     const response = await this.docClient.send(command);
