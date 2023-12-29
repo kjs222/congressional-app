@@ -1,9 +1,9 @@
 import { number, z } from "zod";
 
 export const ddbLatestSchema = z.object({
-  part: z.string(),
-  sort: z.string(), // TODO: make this an enum
-  rollCall: z.number(),
-  date: z.string(),
-  batchId: z.string(),
+  part: z.object({ S: z.string() }),
+  sort: z.object({ S: z.string() }),
+  rollCall: z.object({ N: z.number() }),
+  date: z.object({ S: z.string() }),
+  batchId: z.object({ S: z.string() }),
 });

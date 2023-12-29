@@ -83,7 +83,12 @@ export class DynamoRawDataRepository implements RawDataRepository {
     const parsed = ddbLatestSchema.safeParse(item);
 
     if (parsed.success) {
-      return { ...parsed.data, chamber };
+      return {
+        date: parsed.data.date.S,
+        batchId: parsed.data.batchId.S,
+        rollCall: parsed.data.rollCall.N,
+        chamber,
+      };
     } else {
       console.error(parsed.error);
       throw new Error("Error parsing last vote received");

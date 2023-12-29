@@ -8,6 +8,7 @@ import { collectAndSaveData } from "../data-collector/services/data-collection-s
 
 export const handler = async (event: any = {}): Promise<any> => {
   const apiKey = await getAPIKeyFromSecretsManager();
+  console.log(apiKey);
   const repo = new DynamoRawDataRepository();
   const fetcher = new ProPublicaVoteFetcher(apiKey);
   try {
