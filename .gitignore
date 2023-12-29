@@ -9,3 +9,8 @@ cdk.out
 
 */build/**/*
 */dist/**/*
+
+*/volume/**/*
+*/.volume/**/*
+
+.env
