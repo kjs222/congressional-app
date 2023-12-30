@@ -32,7 +32,7 @@ export class CongressionalAppFrontendStack extends cdk.Stack {
     });
 
     new s3deploy.BucketDeployment(this, "deployment", {
-      sources: [s3deploy.Source.asset("./frontend/build")],
+      sources: [s3deploy.Source.asset("../build")],
       destinationBucket: bucket,
     });
   }

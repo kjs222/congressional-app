@@ -16,7 +16,7 @@ const UserInputEcho: React.FC = () => {
         onChange={handleInputChange}
         placeholder="Type something..."
       />
-      <p>Echo: {userInput}</p>
+      <p>Echoing...: {userInput}</p>
     </div>
   );
 };
