@@ -58,3 +58,5 @@ Then cd into frontend/infrastructure directory and run the following:
 ```
 npx cdk deploy
 ```
+
+front end accessible at: http://kjs222-congressional-application.s3-website-us-east-1.amazonaws.com/

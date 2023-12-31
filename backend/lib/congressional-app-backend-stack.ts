@@ -48,7 +48,7 @@ export class CongressionalAppBackendStack extends cdk.Stack {
       this,
       "congressDataCollectorLambda",
       {
-        entry: "./backend/src/data-collector/handler.ts",
+        entry: "./src/data-collector/handler.ts",
         handler: "handler",
         environment: {
           RAW_VOTES_TABLE_NAME: rawVotesTable.tableName,
