@@ -41,7 +41,7 @@ const collectAndSaveDataForChamber = async (
   );
   console.log(`Found ${recentVoteData.length} new votes for ${chamber}`);
   if (recentVoteData.length === 0) return null;
-  const { roll_call, date } = recentVoteData[recentVoteData.length - 1];
+  const { roll_call, date } = recentVoteData[0];
   const votes = await batchGetVotes(recentVoteData, fetcher);
   const rawVoteInputs = votes.map((vote) => {
     return {
@@ -74,7 +74,8 @@ const getRecentVoteData = async (
     numReceived = numReceived + recentVotes.votes.length;
     recentVotes.votes.forEach((vote: RecentVote) => {
       const isLastVote =
-        lastVoteReceived && vote.roll_call === lastVoteReceived.rollCall;
+        lastVoteReceived &&
+        Number(vote.roll_call) === Number(lastVoteReceived.rollCall);
 
       if (isLastVote) {
         foundLastVote = true;

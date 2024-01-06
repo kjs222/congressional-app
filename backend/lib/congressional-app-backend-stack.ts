@@ -20,9 +20,7 @@ export class CongressionalAppBackendStack extends cdk.Stack {
         sortKey: { name: "sort", type: dynamo.AttributeType.STRING },
         tableName: "congressDataCollectorRaw",
         removalPolicy: cdk.RemovalPolicy.DESTROY,
-        // change below to billingMode: dynamo.BillingMode.PAY_PER_REQUEST
-        readCapacity: 25,
-        writeCapacity: 25,
+        billingMode: dynamo.BillingMode.PAY_PER_REQUEST,
       }
     );
 
@@ -55,6 +53,7 @@ export class CongressionalAppBackendStack extends cdk.Stack {
           PRO_PUBLICA_API_KEY_SECRET_ARN: proPublicaApiSecret.secretArn,
         },
         timeout: cdk.Duration.seconds(240),
+        memorySize: 512,
         initialPolicy: [
           new iam.PolicyStatement({
             actions: [
