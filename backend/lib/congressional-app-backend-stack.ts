@@ -6,6 +6,8 @@ import * as iam from "aws-cdk-lib/aws-iam";
 import * as eventBridge from "aws-cdk-lib/aws-events";
 import * as targets from "aws-cdk-lib/aws-events-targets";
 import * as secrets from "aws-cdk-lib/aws-secretsmanager";
+import * as sqs from "aws-cdk-lib/aws-sqs";
+import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 
 export class CongressionalAppBackendStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -42,6 +44,11 @@ export class CongressionalAppBackendStack extends cdk.Stack {
       }
     );
 
+    const dataAnalyzerQueue = new sqs.Queue(this, "dataAnalyzerQueue", {
+      queueName: "dataAnalyzer.fifo",
+      fifo: true,
+    });
+
     const congressDataCollectorLambda = new lambda.NodejsFunction(
       this,
       "congressDataCollectorLambda",
@@ -51,6 +58,7 @@ export class CongressionalAppBackendStack extends cdk.Stack {
         environment: {
           RAW_VOTES_TABLE_NAME: rawVotesTable.tableName,
           PRO_PUBLICA_API_KEY_SECRET_ARN: proPublicaApiSecret.secretArn,
+          ANALYZER_MESSAGE_QUEUE_URL: dataAnalyzerQueue.queueUrl,
         },
         timeout: cdk.Duration.seconds(240),
         memorySize: 512,
@@ -67,12 +75,49 @@ export class CongressionalAppBackendStack extends cdk.Stack {
             actions: ["secretsmanager:GetSecretValue"],
             resources: [proPublicaApiSecret.secretArn],
           }),
+          new iam.PolicyStatement({
+            actions: ["sqs:SendMessage"],
+            resources: [dataAnalyzerQueue.queueArn],
+          }),
         ],
       }
     );
 
     dataCollectorRule.addTarget(
       new targets.LambdaFunction(congressDataCollectorLambda)
+    );
+
+    const analyzedVotesTable = new dynamo.Table(
+      this,
+      "congressAnalyzedVotesTable",
+      {
+        partitionKey: { name: "part", type: dynamo.AttributeType.STRING },
+        sortKey: { name: "sort", type: dynamo.AttributeType.STRING },
+        tableName: "congressAnalyzedVotes",
+        removalPolicy: cdk.RemovalPolicy.DESTROY,
+        billingMode: dynamo.BillingMode.PAY_PER_REQUEST,
+      }
+    );
+
+    const congressDataAnalyzerLambda = new lambda.NodejsFunction(
+      this,
+      "congressDataAnalyzerLambda",
+      {
+        entry: "./src/data-analyzer/handler.ts",
+        handler: "handler",
+        timeout: cdk.Duration.seconds(240),
+        memorySize: 512,
+        initialPolicy: [
+          new iam.PolicyStatement({
+            actions: ["dynamodb:GetItem", "dynamodb:PutItem"],
+            resources: [rawVotesTable.tableArn, analyzedVotesTable.tableArn],
+          }),
+        ],
+      }
+    );
+
+    congressDataAnalyzerLambda.addEventSource(
+      new SqsEventSource(dataAnalyzerQueue)
     );
   }
 }

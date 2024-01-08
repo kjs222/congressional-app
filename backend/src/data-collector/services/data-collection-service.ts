@@ -1,11 +1,13 @@
 import { Chamber, LastVoteReceived } from "../../types";
 import { RecentVote, VoteResult } from "../../types/propublica-schemas";
+import { AnalyzerMessageSender } from "../ports/analyzer-message-sender";
 import { RawDataRepository } from "../ports/raw-data-repository";
 import { VoteFetcher } from "../ports/vote-fetcher";
 
 export const collectAndSaveData = async (
   repo: RawDataRepository,
-  fetcher: VoteFetcher
+  fetcher: VoteFetcher,
+  analyzerMessageSender: AnalyzerMessageSender
 ) => {
   const batchId = new Date().getTime().toString();
   console.log(`Starting batch ${batchId}`);
@@ -14,7 +16,8 @@ export const collectAndSaveData = async (
     batchId,
     "house",
     repo,
-    fetcher
+    fetcher,
+    analyzerMessageSender
   );
   console.log(`Processed ${houseVotes} house votes`);
   console.log("Collecting senate votes");
@@ -22,7 +25,8 @@ export const collectAndSaveData = async (
     batchId,
     "senate",
     repo,
-    fetcher
+    fetcher,
+    analyzerMessageSender
   );
   console.log(`Processed ${senateVotes} senate votes`);
 };
@@ -31,7 +35,8 @@ const collectAndSaveDataForChamber = async (
   batchId: string,
   chamber: Chamber,
   repo: RawDataRepository,
-  fetcher: VoteFetcher
+  fetcher: VoteFetcher,
+  analyzerMessageSender: AnalyzerMessageSender
 ): Promise<number | null> => {
   const lastVoteReceived = await repo.getLastVoteReceived(chamber);
   const recentVoteData = await getRecentVoteData(
@@ -55,6 +60,16 @@ const collectAndSaveDataForChamber = async (
   await repo.saveRawVotes(rawVoteInputs);
   console.log(`Saving last vote received for ${chamber}`);
   await repo.saveLastVoteReceived(batchId, chamber, roll_call, date);
+
+  for (const input of rawVoteInputs) {
+    console.log(
+      `Sending message for ${input.batchId} ${input.chamber}-${input.rollCall}`
+    );
+    await analyzerMessageSender.send({
+      part: input.batchId,
+      sort: `${input.chamber}-${input.rollCall}`,
+    });
+  }
   return votes.length;
 };
 
