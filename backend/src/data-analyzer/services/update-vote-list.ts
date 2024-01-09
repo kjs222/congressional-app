@@ -1,12 +1,12 @@
-import { VoteResult } from "../../types/propublica-schemas";
+import { VoteWithPosition } from "../../types/propublica-schemas";
 import { VoteOverview } from "../../types/analyzed-data-schemas";
 import { AnalyzedVoteRepository } from "../ports/analyzed-vote-repository";
 
 export const appendNewVoteToList = async (
-  rawVote: VoteResult,
+  rawVote: VoteWithPosition,
   repository: AnalyzedVoteRepository
 ) => {
-  const vote = rawVote.votes.vote;
+  const vote = rawVote;
   const { congress, chamber, roll_call, session } = vote;
 
   const voteList: VoteOverview[] = await repository.getVoteList(

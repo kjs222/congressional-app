@@ -51,7 +51,7 @@ const propublicaPositionSchema = z.object({
   dw_nominate: z.number().nullable(),
 });
 
-const propublicaVoteWithPositionSchema = propublicaVoteSchema.extend({
+export const propublicaVoteWithPositionSchema = propublicaVoteSchema.extend({
   positions: z.array(propublicaPositionSchema),
 });
 
@@ -72,3 +72,4 @@ export type RecentVotesResponse = z.infer<typeof propublicaRecentVotesSchema>;
 export type RecentVote = z.infer<typeof propublicaVoteSchema>;
 
 export type VoteResult = z.infer<typeof propublicaVoteResultSchema>;
+export type VoteWithPosition = z.infer<typeof propublicaVoteWithPositionSchema>;

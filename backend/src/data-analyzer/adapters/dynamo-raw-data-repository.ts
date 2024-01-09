@@ -2,8 +2,8 @@ import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { RawDataRepository } from "../ports/raw-data-repository";
 import {
-  VoteResult,
-  propublicaVoteResultSchema,
+  VoteWithPosition,
+  propublicaVoteWithPositionSchema,
 } from "../../types/propublica-schemas";
 
 export class DynamoRawDataRepository implements RawDataRepository {
@@ -11,7 +11,10 @@ export class DynamoRawDataRepository implements RawDataRepository {
   private readonly docClient = DynamoDBDocumentClient.from(this.client);
   private readonly tableName = "congressDataCollectorRaw";
 
-  async getRawVote(key: string, sort: string): Promise<VoteResult | null> {
+  async getRawVote(
+    key: string,
+    sort: string
+  ): Promise<VoteWithPosition | null> {
     const command = new GetItemCommand({
       TableName: this.tableName,
       Key: {
@@ -26,12 +29,12 @@ export class DynamoRawDataRepository implements RawDataRepository {
 
     const parsed = JSON.parse(item.raw.S as string);
 
-    const schemaParsed = propublicaVoteResultSchema.safeParse(parsed);
+    const schemaParsed = propublicaVoteWithPositionSchema.safeParse(parsed);
 
     if (schemaParsed.success) {
       return schemaParsed.data;
     } else {
-      console.error(parsed.error);
+      console.error(schemaParsed.error);
       throw new Error("Error parsing raw vote");
     }
   }

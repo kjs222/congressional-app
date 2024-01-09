@@ -1,17 +1,16 @@
 import { PartyVote } from "../../types/analyzed-data-schemas";
-import { VoteResult } from "../../types/propublica-schemas";
+import { VoteWithPosition } from "../../types/propublica-schemas";
 import { AnalyzedVoteRepository } from "../ports/analyzed-vote-repository";
 
 export const savePartySummary = async (
   party: "democratic" | "republican",
-  rawVote: VoteResult,
+  rawVote: VoteWithPosition,
   repository: AnalyzedVoteRepository
 ) => {
-  const vote = rawVote.votes.vote;
-  const { congress, chamber, session, roll_call } = vote;
-  const key = `${congress}-${chamber}-${session}-${roll_call}}`;
+  const { congress, chamber, session, roll_call } = rawVote;
+  const key = `${congress}-${chamber}-${session}-${roll_call}`;
 
-  const partyVotes = vote[party]!;
+  const partyVotes = rawVote[party]!;
 
   const totalVotes = partyVotes.yes + partyVotes.no + partyVotes.present;
   const majorityPosition = partyVotes.majority_position.toLowerCase() as
@@ -20,7 +19,10 @@ export const savePartySummary = async (
     | "not_voting"
     | "present";
   const voteWithParty = partyVotes[majorityPosition];
-  const partyPositions = vote.positions.filter((p) => p.party === party);
+
+  const partyPositions = rawVote.positions.filter(
+    (p) => p.party.toLowerCase() === party[0].toLowerCase()
+  );
 
   const { yes, no, not_voting, present } = partyPositions.reduce(
     (
@@ -32,12 +34,21 @@ export const savePartySummary = async (
       },
       position
     ) => {
-      const positionVote = position.vote_position.toLowerCase() as
+      let positionVote = position.vote_position.toLowerCase() as
         | "yes"
         | "no"
         | "not_voting"
-        | "present";
-      acc[positionVote].push(position.name);
+        | "present"
+        | "not voting";
+      if (positionVote === "not voting") {
+        positionVote = "not_voting";
+      }
+
+      if (!acc[positionVote]) {
+        console.log(`unexpected positionVote for party summary`, positionVote);
+      } else {
+        acc[positionVote].push(position.name);
+      }
       return acc;
     },
     { yes: [], no: [], not_voting: [], present: [] }

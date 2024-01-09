@@ -1,15 +1,15 @@
 import { StateVote } from "../../types/analyzed-data-schemas";
-import { VoteResult } from "../../types/propublica-schemas";
+import { VoteWithPosition } from "../../types/propublica-schemas";
 import { AnalyzedVoteRepository } from "../ports/analyzed-vote-repository";
 
 export const saveStateSummary = async (
   state: string,
-  rawVote: VoteResult,
+  rawVote: VoteWithPosition,
   repository: AnalyzedVoteRepository
 ) => {
-  const vote = rawVote.votes.vote;
+  const vote = rawVote;
   const { congress, chamber, session, roll_call } = vote;
-  const key = `${congress}-${chamber}-${session}-${roll_call}}`;
+  const key = `${congress}-${chamber}-${session}-${roll_call}`;
 
   const statePositions = vote.positions.filter((p) => p.state === state);
 
@@ -23,12 +23,21 @@ export const saveStateSummary = async (
       },
       position
     ) => {
-      const positionVote = position.vote_position.toLowerCase() as
+      let positionVote = position.vote_position.toLowerCase() as
         | "yes"
         | "no"
         | "not_voting"
+        | "not voting"
         | "present";
-      acc[positionVote].push({ name: position.name, party: position.party });
+      if (positionVote === "not voting") {
+        positionVote = "not_voting";
+      }
+
+      if (!acc[positionVote]) {
+        console.log(`unexpected positionVote for state ${state}`, positionVote);
+      } else {
+        acc[positionVote].push({ name: position.name, party: position.party });
+      }
       return acc;
     },
     { yes: [], no: [], not_voting: [], present: [] }

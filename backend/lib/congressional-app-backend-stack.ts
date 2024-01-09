@@ -47,6 +47,7 @@ export class CongressionalAppBackendStack extends cdk.Stack {
     const dataAnalyzerQueue = new sqs.Queue(this, "dataAnalyzerQueue", {
       queueName: "dataAnalyzer.fifo",
       fifo: true,
+      visibilityTimeout: cdk.Duration.seconds(240),
     });
 
     const congressDataCollectorLambda = new lambda.NodejsFunction(

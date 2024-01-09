@@ -27,7 +27,7 @@ export const run = async (
   await savePartySummary("republican", rawVote, analyzedVoteRepo);
 
   console.log("saving state summaries");
-  const states = rawVote.votes.vote.positions.map((p) => p.state);
+  const states = rawVote.positions.map((p) => p.state);
   const uniqueStates = [...new Set(states)];
   for (const state of uniqueStates) {
     await saveStateSummary(state, rawVote, analyzedVoteRepo);

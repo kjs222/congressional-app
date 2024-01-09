@@ -1,14 +1,14 @@
-import { VoteResult } from "../../types/propublica-schemas";
+import { VoteWithPosition } from "../../types/propublica-schemas";
 import { VoteSummary } from "../../types/analyzed-data-schemas";
 import { AnalyzedVoteRepository } from "../ports/analyzed-vote-repository";
 
 export const saveVoteSummary = async (
-  rawVote: VoteResult,
+  rawVote: VoteWithPosition,
   repository: AnalyzedVoteRepository
 ) => {
-  const vote = rawVote.votes.vote;
+  const vote = rawVote;
   const { congress, chamber, session, roll_call } = vote;
-  const key = `${congress}-${chamber}-${session}-${roll_call}}`;
+  const key = `${congress}-${chamber}-${session}-${roll_call}`;
 
   const totalVotes = vote.total.yes + vote.total.no + vote.total.present;
 
