@@ -5,13 +5,15 @@ import {
 import { DynamoRawDataRepository } from "./adapters/dynamo-raw-data-repository";
 import { ProPublicaVoteFetcher } from "./adapters/propublica-vote-fetcher";
 import { collectAndSaveData } from "./services/data-collection-service";
+import { SQSAnalyzerMessageSender } from "./adapters/sqs-analyzer-message-sender";
 
-export const handler = async (event: any = {}): Promise<any> => {
+export const handler = async (_event: any = {}): Promise<any> => {
   const apiKey = await getAPIKeyFromSecretsManager();
   const repo = new DynamoRawDataRepository();
   const fetcher = new ProPublicaVoteFetcher(apiKey);
+  const messageSender = new SQSAnalyzerMessageSender();
   try {
-    await collectAndSaveData(repo, fetcher);
+    await collectAndSaveData(repo, fetcher, messageSender);
     return { statusCode: 200 };
   } catch (error) {
     console.log(error);

@@ -9,6 +9,7 @@ import * as secrets from "aws-cdk-lib/aws-secretsmanager";
 import * as sqs from "aws-cdk-lib/aws-sqs";
 import * as apigateway from "aws-cdk-lib/aws-apigatewayv2";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
+import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 
 export class CongressionalAppBackendStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -122,36 +123,56 @@ export class CongressionalAppBackendStack extends cdk.Stack {
       new SqsEventSource(dataAnalyzerQueue)
     );
 
-    // add code to create a lambda handler that will respond with all votes for a chamber
-    const congressDataApiLambda = new lambda.NodejsFunction(
+    const apiLambdaVotes = new lambda.NodejsFunction(
       this,
-      "congressDataApiLambda",
+      "getVotesApiLambda",
       {
-        entry: "./src/data-api/handler.ts",
+        entry: "./src/api/handlers/votes-handler.ts",
         handler: "handler",
-        timeout: cdk.Duration.seconds(240),
-        memorySize: 512,
         initialPolicy: [
           new iam.PolicyStatement({
-            actions: ["dynamodb:GetItem", "dynamodb:PutItem"],
+            actions: ["dynamodb:GetItem"],
             resources: [analyzedVotesTable.tableArn],
           }),
         ],
       }
     );
 
+    const apiLambdaVote = new lambda.NodejsFunction(this, "getVoteApiLambda", {
+      entry: "./src/api/handlers/vote-handler.ts",
+      handler: "handler",
+      initialPolicy: [
+        new iam.PolicyStatement({
+          actions: ["dynamodb:GetItem"],
+          resources: [analyzedVotesTable.tableArn],
+        }),
+      ],
+    });
+
     const api = new apigateway.HttpApi(this, "VotesApi", {
       apiName: "Votes API",
     });
-    // read this: https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_apigatewayv2-readme.html#defining-http-apis
 
-    // Add /votes route and integrate with Lambda function
+    const votesIntegration = new HttpLambdaIntegration(
+      "votes-api-integration",
+      apiLambdaVotes
+    );
+
     api.addRoutes({
       path: "/votes",
       methods: [apigateway.HttpMethod.GET],
-      integration: new apigateway.LambdaProxyIntegration({
-        handler: votesLambda,
-      }),
+      integration: votesIntegration,
+    });
+
+    const voteIntegration = new HttpLambdaIntegration(
+      "vote-api-integration",
+      apiLambdaVote
+    );
+
+    api.addRoutes({
+      path: "/vote/{id}",
+      methods: [apigateway.HttpMethod.GET],
+      integration: voteIntegration,
     });
   }
 }
