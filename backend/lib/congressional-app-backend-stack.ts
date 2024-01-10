@@ -7,6 +7,7 @@ import * as eventBridge from "aws-cdk-lib/aws-events";
 import * as targets from "aws-cdk-lib/aws-events-targets";
 import * as secrets from "aws-cdk-lib/aws-secretsmanager";
 import * as sqs from "aws-cdk-lib/aws-sqs";
+import * as apigateway from "aws-cdk-lib/aws-apigatewayv2";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 
 export class CongressionalAppBackendStack extends cdk.Stack {
@@ -120,5 +121,37 @@ export class CongressionalAppBackendStack extends cdk.Stack {
     congressDataAnalyzerLambda.addEventSource(
       new SqsEventSource(dataAnalyzerQueue)
     );
+
+    // add code to create a lambda handler that will respond with all votes for a chamber
+    const congressDataApiLambda = new lambda.NodejsFunction(
+      this,
+      "congressDataApiLambda",
+      {
+        entry: "./src/data-api/handler.ts",
+        handler: "handler",
+        timeout: cdk.Duration.seconds(240),
+        memorySize: 512,
+        initialPolicy: [
+          new iam.PolicyStatement({
+            actions: ["dynamodb:GetItem", "dynamodb:PutItem"],
+            resources: [analyzedVotesTable.tableArn],
+          }),
+        ],
+      }
+    );
+
+    const api = new apigateway.HttpApi(this, "VotesApi", {
+      apiName: "Votes API",
+    });
+    // read this: https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_apigatewayv2-readme.html#defining-http-apis
+
+    // Add /votes route and integrate with Lambda function
+    api.addRoutes({
+      path: "/votes",
+      methods: [apigateway.HttpMethod.GET],
+      integration: new apigateway.LambdaProxyIntegration({
+        handler: votesLambda,
+      }),
+    });
   }
 }
