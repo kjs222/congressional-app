@@ -1,7 +1,36 @@
+import { DynamoAnalyzedVoteRepository } from "../adapters/dynamo-analyzed-vote-repository";
+
 export const handler = async (_event: any = {}): Promise<any> => {
   console.log("event", _event);
-  return { statusCode: 200 };
+
+  const pathParameters = _event.pathParameters || {};
+  const partitionKey = pathParameters.id;
+
+  const queryStringParameters = _event.queryStringParameters || {};
+  const repo = new DynamoAnalyzedVoteRepository();
+
+  if (queryStringParameters.party) {
+    const party = queryStringParameters.party;
+    const data = await repo.getVotePartyDetail(partitionKey, party);
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ status: "success", data }),
+    };
+  }
+
+  if (queryStringParameters.state) {
+    const state = queryStringParameters.state;
+    const data = await repo.getVoteStateDetail(partitionKey, state);
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ status: "success", data }),
+    };
+  }
+
+  const data = await repo.getVoteSummary(partitionKey);
+  return { statusCode: 200, body: JSON.stringify({ status: "success", data }) };
 };
+
 /* 
 
 {

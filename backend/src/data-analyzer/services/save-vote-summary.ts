@@ -25,7 +25,7 @@ export const saveVoteSummary = async (
     totalNotVoting: vote.total.not_voting || 0,
     totalPresent: vote.total.present || 0,
     democraticPosition: vote.democratic?.majority_position || "unknown",
-    republicanPosition: vote.democratic?.majority_position || "unknown",
+    republicanPosition: vote.republican?.majority_position || "unknown",
   };
 
   await repository.saveVoteAnalysis({

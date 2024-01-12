@@ -131,7 +131,7 @@ export class CongressionalAppBackendStack extends cdk.Stack {
         handler: "handler",
         initialPolicy: [
           new iam.PolicyStatement({
-            actions: ["dynamodb:GetItem"],
+            actions: ["dynamodb:GetItem", "dynamodb:Query"],
             resources: [analyzedVotesTable.tableArn],
           }),
         ],

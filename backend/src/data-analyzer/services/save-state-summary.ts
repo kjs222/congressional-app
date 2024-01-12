@@ -54,7 +54,7 @@ export const saveStateSummary = async (
     totalNotVoting: not_voting.length,
     totalPresent: present.length,
     percentYes: percentValue(yes.length / statePositions.length),
-    percentNo: percentValue(yes.length / statePositions.length),
+    percentNo: percentValue(no.length / statePositions.length),
     position: yes.length > no.length ? "yes" : "no",
     yesRepublicanVoters: yes.filter((v) => v.party === "R").map((v) => v.name),
     yesDemocraticVoters: yes.filter((v) => v.party === "D").map((v) => v.name),
