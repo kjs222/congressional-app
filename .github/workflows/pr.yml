@@ -1,0 +1,47 @@
+name: Pull Request
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check-code-changes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Check code changes
+        id: code_changes
+        run: |
+          git --no-pager diff --name-only HEAD $(git merge-base HEAD origin/main) | grep frontend/ || echo "No frontend code changes"
+          echo "::set-output name=backend-changes::$(git --no-pager diff --name-only HEAD $(git merge-base HEAD origin/main) | grep backend/)"
+          echo "::set-output name=frontend-changes::$(git --no-pager diff --name-only HEAD $(git merge-base HEAD origin/main) | grep frontend/)"
+
+  test-backend:
+    needs: check-code-changes
+    runs-on: ubuntu-latest
+    if: ${{ steps.code_changes.outputs.backend-changes != '' }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          cd backend
+          npm install
+      - name: Run tests
+        run: |
+          cd backend
+          npm run unit-test
+
+  test-frontend:
+    needs: check-code-changes
+    runs-on: ubuntu-latest
+    if: ${{ steps.code_changes.outputs.frontend-changes != '' }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm install
+      - name: Run tests
+        run: |
+          cd frontend
+          npm run test
