@@ -11,7 +11,7 @@ const propublicaPartyVoteBreakdownSchema = propublicaVoteBreakdownSchema.extend(
   { majority_position: z.string() }
 );
 
-const propublicaVoteSchema = z.object({
+export const propublicaVoteSchema = z.object({
   chamber: z.string(), // add options?
   congress: z.number(),
   session: z.number(),
