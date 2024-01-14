@@ -40,8 +40,9 @@ export async function backfill(tableName: string, queueUrl: string) {
   return;
 }
 
-// (async () => {
-//   const tableName = "addTableNameHere";
-//   const queueUrl = "add queue url here";
-//   await backfill(tableName, queueUrl);
-// })();
+// npx ts-node scripts/backfill.ts
+(async () => {
+  const tableName = "congressDataCollectorRaw";
+  const queueUrl = "add your queue url here";
+  await backfill(tableName, queueUrl);
+})();

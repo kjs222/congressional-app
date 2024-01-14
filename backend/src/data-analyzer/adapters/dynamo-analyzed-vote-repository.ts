@@ -2,8 +2,8 @@ import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
 import { PutCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { z } from "zod";
 import { AnalyzedVoteRepository } from "../ports/analyzed-vote-repository";
-import { VoteOverview } from "../../types/analyzed-data-schemas";
-import { voteOverviewSchema } from "../../types/analyzed-data-schemas";
+import { VoteOverviewWithId } from "../../types/analyzed-data-schemas";
+import { voteOverviewWithIdSchema } from "../../types/analyzed-data-schemas";
 
 export class DynamoAnalyzedVoteRepository implements AnalyzedVoteRepository {
   private readonly client = new DynamoDBClient({ region: "us-east-1" });
@@ -32,7 +32,7 @@ export class DynamoAnalyzedVoteRepository implements AnalyzedVoteRepository {
   async saveVoteList(
     congress: number,
     chamber: string,
-    voteList: VoteOverview[]
+    voteList: VoteOverviewWithId[]
   ) {
     const sort = `${congress}-${chamber.toLowerCase()}`;
 
@@ -53,7 +53,7 @@ export class DynamoAnalyzedVoteRepository implements AnalyzedVoteRepository {
   async getVoteList(
     congress: number,
     chamber: string
-  ): Promise<VoteOverview[]> {
+  ): Promise<VoteOverviewWithId[]> {
     const sort = `${congress}-${chamber.toLowerCase()}`;
     const command = new GetItemCommand({
       TableName: this.tableName,
@@ -68,7 +68,7 @@ export class DynamoAnalyzedVoteRepository implements AnalyzedVoteRepository {
     if (!item) return [];
     const orderedVotes = JSON.parse(item.orderedVotes.S?.toString() || "[]");
 
-    const schema = z.array(voteOverviewSchema);
+    const schema = z.array(voteOverviewWithIdSchema);
 
     const parsed = schema.safeParse(orderedVotes);
 

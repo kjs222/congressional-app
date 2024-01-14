@@ -15,6 +15,10 @@ export const voteOverviewSchema = z.object({
   billLatestAction: z.string().optional().nullable(),
 });
 
+export const voteOverviewWithIdSchema = voteOverviewSchema.extend({
+  id: z.string(),
+});
+
 export const voteOverviewRecordSchema = z.object({
   part: z.string(), // "all-votes"
   sort: z.string(), // "<congress>-<chamber>"
@@ -88,13 +92,17 @@ export const stateVoteRecordSchema = z.object({
 });
 
 export type VoteOverview = z.infer<typeof voteOverviewSchema>;
+export type VoteOverviewWithId = VoteOverview & { id: string };
 export type VoteOverviewRecord = z.infer<typeof voteOverviewRecordSchema>;
 
 export type VoteSummary = z.infer<typeof voteSummarySchema>;
+export type VoteSummaryWithId = VoteSummary & { id: string };
 export type VoteSummaryRecord = z.infer<typeof voteSummaryRecordSchema>;
 
 export type PartyVote = z.infer<typeof partyVoteSchema>;
+export type PartyVoteWithId = PartyVote & { id: string };
 export type PartyVoteRecord = z.infer<typeof partyVoteRecordSchema>;
 
 export type StateVote = z.infer<typeof stateVoteSchema>;
+export type StateVoteWithId = StateVote & { id: string };
 export type StateVoteRecord = z.infer<typeof stateVoteRecordSchema>;

@@ -1,4 +1,4 @@
-import { PartyVote } from "../../types/analyzed-data-schemas";
+import { PartyVoteWithId } from "../../types/analyzed-data-schemas";
 import { VoteWithPosition } from "../../types/propublica-schemas";
 import { AnalyzedVoteRepository } from "../ports/analyzed-vote-repository";
 
@@ -58,7 +58,8 @@ export const savePartySummary = async (
     return Math.round(value * 10000) / 100;
   };
 
-  const summary: PartyVote = {
+  const summary: PartyVoteWithId = {
+    id: `${key}-${party}`,
     party,
     totalYes: partyVotes.yes,
     totalNo: partyVotes.no,

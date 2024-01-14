@@ -1,11 +1,14 @@
-import { VoteOverview } from "../../types/analyzed-data-schemas";
+import { VoteOverviewWithId } from "../../types/analyzed-data-schemas";
 
 export interface AnalyzedVoteRepository {
-  getVoteList: (congress: number, chamber: string) => Promise<VoteOverview[]>;
+  getVoteList: (
+    congress: number,
+    chamber: string
+  ) => Promise<VoteOverviewWithId[]>;
   saveVoteList: (
     congress: number,
     chamber: string,
-    voteList: VoteOverview[]
+    voteList: VoteOverviewWithId[]
   ) => Promise<void>;
   saveVoteAnalysis: (data: {
     key: string;

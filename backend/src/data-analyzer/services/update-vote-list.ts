@@ -1,5 +1,5 @@
 import { VoteWithPosition } from "../../types/propublica-schemas";
-import { VoteOverview } from "../../types/analyzed-data-schemas";
+import { VoteOverviewWithId } from "../../types/analyzed-data-schemas";
 import { AnalyzedVoteRepository } from "../ports/analyzed-vote-repository";
 
 export const appendNewVoteToList = async (
@@ -9,12 +9,13 @@ export const appendNewVoteToList = async (
   const vote = rawVote;
   const { congress, chamber, roll_call, session } = vote;
 
-  const voteList: VoteOverview[] = await repository.getVoteList(
+  const voteList: VoteOverviewWithId[] = await repository.getVoteList(
     congress,
     chamber
   );
 
-  const voteOverview: VoteOverview = {
+  const voteOverview: VoteOverviewWithId = {
+    id: `${congress}-${chamber}-${session}-${roll_call}`,
     congress,
     chamber,
     rollCall: roll_call,
@@ -29,7 +30,15 @@ export const appendNewVoteToList = async (
     billLatestAction: vote.bill?.latest_action,
   };
 
-  voteList.push(voteOverview);
+  // find index of vote with same id
+  const voteIndex = voteList.findIndex((v) => v.id === voteOverview.id);
+  // if found, replace it
+  if (voteIndex >= 0) {
+    voteList[voteIndex] = voteOverview;
+  } else {
+    // if not found, append it
+    voteList.push(voteOverview);
+  }
 
   const sortedByDateDesc = voteList.sort((a, b) => {
     const aDate = new Date(a.date);

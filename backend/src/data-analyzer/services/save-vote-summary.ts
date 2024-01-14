@@ -1,5 +1,5 @@
 import { VoteWithPosition } from "../../types/propublica-schemas";
-import { VoteSummary } from "../../types/analyzed-data-schemas";
+import { VoteSummaryWithId } from "../../types/analyzed-data-schemas";
 import { AnalyzedVoteRepository } from "../ports/analyzed-vote-repository";
 
 export const saveVoteSummary = async (
@@ -16,7 +16,8 @@ export const saveVoteSummary = async (
     return Math.round(value * 10000) / 100;
   };
 
-  const summary: VoteSummary = {
+  const summary: VoteSummaryWithId = {
+    id: key,
     result: vote.result,
     percentYes: percentValue(vote.total.yes / totalVotes),
     percentNo: percentValue(vote.total.no / totalVotes),

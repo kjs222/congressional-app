@@ -1,12 +1,11 @@
-import React from 'react';
 import './App.css';
-import UserInputEcho from './UserInputEcho';
+import VoteList from './VoteList';
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <UserInputEcho />
+        <VoteList />
       </header>
     </div>
   );

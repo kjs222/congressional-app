@@ -3,6 +3,12 @@ import { DynamoAnalyzedVoteRepository } from "../adapters/dynamo-analyzed-vote-r
 export const handler = async (_event: any = {}): Promise<any> => {
   console.log("event", _event);
 
+  const headers = {
+    "Access-Control-Allow-Origin":
+      "http://kjs222-congressional-application.s3-website-us-east-1.amazonaws.com",
+    "Access-Control-Allow-Credentials": true,
+  };
+
   const pathParameters = _event.pathParameters || {};
   const partitionKey = pathParameters.id;
 
@@ -14,6 +20,7 @@ export const handler = async (_event: any = {}): Promise<any> => {
     const data = await repo.getVotePartyDetail(partitionKey, party);
     return {
       statusCode: 200,
+      headers,
       body: JSON.stringify({ status: "success", data }),
     };
   }
@@ -23,12 +30,17 @@ export const handler = async (_event: any = {}): Promise<any> => {
     const data = await repo.getVoteStateDetail(partitionKey, state);
     return {
       statusCode: 200,
+      headers,
       body: JSON.stringify({ status: "success", data }),
     };
   }
 
   const data = await repo.getVoteSummary(partitionKey);
-  return { statusCode: 200, body: JSON.stringify({ status: "success", data }) };
+  return {
+    statusCode: 200,
+    headers,
+    body: JSON.stringify({ status: "success", data }),
+  };
 };
 
 /* 

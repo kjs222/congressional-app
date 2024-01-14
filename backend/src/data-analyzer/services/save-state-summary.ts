@@ -1,4 +1,4 @@
-import { StateVote } from "../../types/analyzed-data-schemas";
+import { StateVoteWithId } from "../../types/analyzed-data-schemas";
 import { VoteWithPosition } from "../../types/propublica-schemas";
 import { AnalyzedVoteRepository } from "../ports/analyzed-vote-repository";
 
@@ -47,7 +47,8 @@ export const saveStateSummary = async (
     return Math.round(value * 10000) / 100;
   };
 
-  const summary: StateVote = {
+  const summary: StateVoteWithId = {
+    id: `${key}-${state}`,
     state,
     totalYes: yes.length,
     totalNo: no.length,

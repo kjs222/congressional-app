@@ -9,7 +9,7 @@ const UserInputEcho: React.FC = () => {
 
   return (
     <div>
-      <h2>Type Something:</h2>
+      <h2>Type Something please:</h2>
       <input
         type="text"
         value={userInput}
