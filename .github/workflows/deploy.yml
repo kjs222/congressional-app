@@ -36,6 +36,11 @@ jobs:
           cd frontend
           npm install
 
+      - name: Create .env file
+        run: |
+          cd frontend
+          echo "REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}" > .env
+
       - name: Build frontend
         run: |
           cd frontend
