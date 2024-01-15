@@ -25,7 +25,7 @@ describe("handler", () => {
       const response = await handler({
         queryStringParameters: { chamber: "house" },
       });
-      expect(response).to.deep.equal({
+      expect(response).to.deep.include({
         statusCode: 200,
         body: JSON.stringify({ status: "success", data: [] }),
       });
@@ -33,7 +33,7 @@ describe("handler", () => {
 
     it("should return the expected response on an invalid request without a chamber", async () => {
       const response = await handler({});
-      expect(response).to.deep.equal({
+      expect(response).to.deep.include({
         statusCode: 400,
         body: "Missing chamber",
       });

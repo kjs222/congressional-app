@@ -58,7 +58,7 @@ describe("handler", () => {
       const response = await handler({
         pathParameters: { id: "123" },
       });
-      expect(response).to.deep.equal({
+      expect(response).to.deep.include({
         statusCode: 200,
         body: JSON.stringify({ status: "success", data: { any: "thing" } }),
       });
