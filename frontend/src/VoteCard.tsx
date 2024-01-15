@@ -3,6 +3,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 import { VoteOverview } from './types/vote.types';
 
@@ -23,9 +24,7 @@ export const VoteCard: React.FC<{ item: VoteOverview}> = ({ item }) => {
         <Typography variant="body2">
           {item.description}
         </Typography>
-        <button onClick={handleSeeDetails}>
-          See Details
-        </button>
+        <Button onClick={handleSeeDetails} variant="contained" color="secondary">See Details</Button>
       </CardContent>
     </Card>
   );
