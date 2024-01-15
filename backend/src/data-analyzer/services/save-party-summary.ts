@@ -1,6 +1,7 @@
 import { PartyVoteWithId } from "../../types/analyzed-data-schemas";
 import { VoteWithPosition } from "../../types/propublica-schemas";
 import { AnalyzedVoteRepository } from "../ports/analyzed-vote-repository";
+import logger from "../../logger";
 
 export const savePartySummary = async (
   party: "democratic" | "republican",
@@ -45,7 +46,7 @@ export const savePartySummary = async (
       }
 
       if (!acc[positionVote]) {
-        console.log(`unexpected positionVote for party summary`, positionVote);
+        logger.warn(`unexpected positionVote for party summary`, positionVote);
       } else {
         acc[positionVote].push(position.name);
       }

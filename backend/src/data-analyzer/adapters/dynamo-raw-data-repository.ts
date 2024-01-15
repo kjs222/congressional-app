@@ -5,6 +5,7 @@ import {
   VoteWithPosition,
   propublicaVoteWithPositionSchema,
 } from "../../types/propublica-schemas";
+import logger from "../../logger";
 
 export class DynamoRawDataRepository implements RawDataRepository {
   private readonly client =
@@ -40,7 +41,9 @@ export class DynamoRawDataRepository implements RawDataRepository {
     if (schemaParsed.success) {
       return schemaParsed.data;
     } else {
-      console.error(schemaParsed.error);
+      logger.error("Error parsing response in getRawVote", {
+        error: schemaParsed.error,
+      });
       throw new Error("Error parsing raw vote");
     }
   }

@@ -4,6 +4,7 @@ import {
 } from "../ports/analyzer-message-sender";
 import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
 import * as crypto from "crypto";
+import logger from "../../logger";
 
 export class SQSAnalyzerMessageSender implements AnalyzerMessageSender {
   private readonly client = new SQSClient({ region: "us-east-1" });
@@ -18,7 +19,7 @@ export class SQSAnalyzerMessageSender implements AnalyzerMessageSender {
     });
 
     const response = await this.client.send(command);
-    console.log(JSON.stringify(response));
+    logger.info("Sent message to SQS", { response });
     return;
   }
 

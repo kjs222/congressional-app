@@ -17,6 +17,7 @@ import {
   voteOverviewWithIdSchema,
 } from "../../types/analyzed-data-schemas";
 import { Chamber } from "../../types";
+import logger from "../../logger";
 
 export class DynamoAnalyzedVoteRepository implements AnalyzedVoteRepository {
   private readonly client =
@@ -50,7 +51,9 @@ export class DynamoAnalyzedVoteRepository implements AnalyzedVoteRepository {
     if (parsed.success) {
       return parsed.data;
     } else {
-      console.error(parsed.error);
+      logger.error("Error parsing response in getVoteSummary", {
+        error: parsed.error,
+      });
       throw new Error("Error parsing vote summary");
     }
   }
@@ -79,7 +82,9 @@ export class DynamoAnalyzedVoteRepository implements AnalyzedVoteRepository {
     if (parsed.success) {
       return parsed.data;
     } else {
-      console.error(parsed.error);
+      logger.error("Error parsing response in getVoteStateDetail", {
+        error: parsed.error,
+      });
       throw new Error("Error parsing vote summary");
     }
   }
@@ -108,7 +113,9 @@ export class DynamoAnalyzedVoteRepository implements AnalyzedVoteRepository {
     if (parsed.success) {
       return parsed.data;
     } else {
-      console.error(parsed.error);
+      logger.error("Error parsing response in getVotePartyDetail", {
+        error: parsed.error,
+      });
       throw new Error("Error parsing vote summary");
     }
   }
@@ -147,7 +154,9 @@ export class DynamoAnalyzedVoteRepository implements AnalyzedVoteRepository {
         if (parsed.success) {
           return parsed.data;
         } else {
-          console.error(parsed.error);
+          logger.error("Error parsing response in getVotes", {
+            error: parsed.error,
+          });
           throw new Error("Error parsing vote summary");
         }
       })
@@ -169,13 +178,11 @@ export class DynamoAnalyzedVoteRepository implements AnalyzedVoteRepository {
       // If dates are the same, sort by rollCall in descending order
       return b.rollCall - a.rollCall;
     });
-    console.log("ordered", ordered.length);
 
     limit = limit || 100;
     offset = offset || 0;
 
     const subset = ordered.slice(offset, offset + limit);
-    console.log("subset", subset.length);
 
     return subset;
   }

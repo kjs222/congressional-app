@@ -6,6 +6,7 @@ import { DynamoRawDataRepository } from "./adapters/dynamo-raw-data-repository";
 import { ProPublicaVoteFetcher } from "./adapters/propublica-vote-fetcher";
 import { collectAndSaveData } from "./services/data-collection-service";
 import { SQSAnalyzerMessageSender } from "./adapters/sqs-analyzer-message-sender";
+import logger from "../logger";
 
 export const handler = async (_event: any = {}): Promise<any> => {
   const apiKey = await getAPIKeyFromSecretsManager();
@@ -16,7 +17,7 @@ export const handler = async (_event: any = {}): Promise<any> => {
     await collectAndSaveData(repo, fetcher, messageSender);
     return { statusCode: 200 };
   } catch (error) {
-    console.log(error);
+    logger.error("Error in data collector handler", error);
     return { statusCode: 500 };
   }
 };

@@ -4,7 +4,7 @@ import { z } from "zod";
 import { AnalyzedVoteRepository } from "../ports/analyzed-vote-repository";
 import { VoteOverviewWithId } from "../../types/analyzed-data-schemas";
 import { voteOverviewWithIdSchema } from "../../types/analyzed-data-schemas";
-
+import logger from "../../logger";
 export class DynamoAnalyzedVoteRepository implements AnalyzedVoteRepository {
   private readonly client =
     process.env.NODE_ENV === "test"
@@ -30,8 +30,7 @@ export class DynamoAnalyzedVoteRepository implements AnalyzedVoteRepository {
       },
     });
 
-    const response = await this.docClient.send(command);
-    console.log(JSON.stringify(response));
+    await this.docClient.send(command);
     return;
   }
 
@@ -51,8 +50,7 @@ export class DynamoAnalyzedVoteRepository implements AnalyzedVoteRepository {
         lastVote: voteList[0].date,
       },
     });
-    const response = await this.docClient.send(command);
-    console.log(JSON.stringify(response));
+    await this.docClient.send(command);
     return;
   }
 
@@ -81,7 +79,9 @@ export class DynamoAnalyzedVoteRepository implements AnalyzedVoteRepository {
     if (parsed.success) {
       return parsed.data;
     } else {
-      console.error(parsed.error);
+      logger.error("Error parsing response in getVoteList", {
+        error: parsed.error,
+      });
       throw new Error("Error parsing last vote received");
     }
   }

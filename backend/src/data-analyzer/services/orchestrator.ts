@@ -4,6 +4,7 @@ import { savePartySummary } from "./save-party-summary";
 import { saveStateSummary } from "./save-state-summary";
 import { saveVoteSummary } from "./save-vote-summary";
 import { appendNewVoteToList } from "./update-vote-list";
+import logger from "../../logger";
 
 export const run = async (
   part: string,
@@ -13,20 +14,20 @@ export const run = async (
 ) => {
   const rawVote = await rawVoteRepo.getRawVote(part, sort);
   if (!rawVote) {
-    console.log(`No vote found for ${part}-${sort}`);
+    logger.info(`No vote found for ${part}-${sort}`);
     return;
   }
-  console.log("Appending new vote to list");
+  logger.info("Appending new vote to list");
   await appendNewVoteToList(rawVote, analyzedVoteRepo);
 
-  console.log("saving summary");
+  logger.info("saving summary");
   await saveVoteSummary(rawVote, analyzedVoteRepo);
 
-  console.log("saving party summaries");
+  logger.info("saving party summaries");
   await savePartySummary("democratic", rawVote, analyzedVoteRepo);
   await savePartySummary("republican", rawVote, analyzedVoteRepo);
 
-  console.log("saving state summaries");
+  logger.info("saving state summaries");
   const states = rawVote.positions.map((p) => p.state);
   const uniqueStates = [...new Set(states)];
   for (const state of uniqueStates) {

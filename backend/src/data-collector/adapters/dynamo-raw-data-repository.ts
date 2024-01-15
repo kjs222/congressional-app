@@ -7,6 +7,7 @@ import { PutCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { RawDataRepository, RawVoteInput } from "../ports/raw-data-repository";
 import { Chamber, LastVoteReceived } from "../../types";
 import { ddbLatestSchema } from "../../types/ddb-schemas";
+import logger from "../../logger";
 
 export class DynamoRawDataRepository implements RawDataRepository {
   private readonly client =
@@ -43,8 +44,7 @@ export class DynamoRawDataRepository implements RawDataRepository {
           congressDataCollectorRaw: batch,
         },
       });
-      const response = await this.docClient.send(command);
-      console.log(JSON.stringify(response));
+      await this.docClient.send(command);
       await new Promise((resolve) => setTimeout(resolve, 2000));
     }
     return;
@@ -66,8 +66,7 @@ export class DynamoRawDataRepository implements RawDataRepository {
         batchId,
       },
     });
-    const response = await this.docClient.send(command);
-    console.log(JSON.stringify(response));
+    await this.docClient.send(command);
     return { batchId, chamber };
   }
 
@@ -96,7 +95,9 @@ export class DynamoRawDataRepository implements RawDataRepository {
         chamber,
       };
     } else {
-      console.error(parsed.error);
+      logger.error("Error parsing response in getLastVoteReceived", {
+        error: parsed.error,
+      });
       throw new Error("Error parsing last vote received");
     }
   }
