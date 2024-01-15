@@ -4,6 +4,12 @@ on:
     branches:
       - main
 
+services:
+  dynamodb:
+    image: amazon/dynamodb-local
+    ports:
+      - 8000:8000
+
 jobs:
   check-code-changes:
     runs-on: ubuntu-latest
@@ -16,7 +22,7 @@ jobs:
           echo "::set-output name=backend-changes::$(git --no-pager diff --name-only HEAD $(git merge-base HEAD origin/main) | grep backend/)"
           echo "::set-output name=frontend-changes::$(git --no-pager diff --name-only HEAD $(git merge-base HEAD origin/main) | grep frontend/)"
 
-  test-backend:
+  unit-test-backend:
     needs: check-code-changes
     runs-on: ubuntu-latest
     if: ${{ steps.code_changes.outputs.backend-changes != '' }}
@@ -30,6 +36,25 @@ jobs:
         run: |
           cd backend
           npm run unit-test
+
+  integration-test-backend:
+    needs: check-code-changes
+    runs-on: ubuntu-latest
+    if: ${{ steps.code_changes.outputs.backend-changes != '' }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          cd backend
+          npm install
+      - name: Create local database tables
+        run: |
+          cd backend
+          npm run create-local-ddb-tables
+      - name: Run tests
+        run: |
+          cd backend
+          npm run integration-test
 
   test-frontend:
     needs: check-code-changes
