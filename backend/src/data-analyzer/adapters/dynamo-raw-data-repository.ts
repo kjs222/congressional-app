@@ -7,7 +7,13 @@ import {
 } from "../../types/propublica-schemas";
 
 export class DynamoRawDataRepository implements RawDataRepository {
-  private readonly client = new DynamoDBClient({ region: "us-east-1" });
+  private readonly client =
+    process.env.NODE_ENV === "test"
+      ? new DynamoDBClient({
+          region: "localhost",
+          endpoint: "http://localhost:8000",
+        })
+      : new DynamoDBClient({ region: "us-east-1" });
   private readonly docClient = DynamoDBDocumentClient.from(this.client);
   private readonly tableName = "congressDataCollectorRaw";
 

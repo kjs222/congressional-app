@@ -138,6 +138,7 @@ export class CongressionalAppBackendStack extends cdk.Stack {
       }
     );
 
+    // from here down is the api gateway
     const apiLambdaVote = new lambda.NodejsFunction(this, "getVoteApiLambda", {
       entry: "./src/api/handlers/vote-handler.ts",
       handler: "handler",

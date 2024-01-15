@@ -8,7 +8,12 @@
     "build": "tsc",
     "watch": "tsc -w",
     "cdk": "cdk",
-    "unit-test": "mocha --require ts-node/register test/unit/**/*.spec.ts"
+    "start-local-ddb": "scripts/init-local-db.sh",
+    "stop-local-ddb": "scripts/stop-local-db.sh",
+    "create-local-ddb-tables": "ts-node scripts/ddb-local-table-setup.ts",
+    "unit-test": "mocha --require ts-node/register test/unit/**/*.spec.ts",
+    "integration-test": "NODE_ENV=test mocha --timeout 5000 --require ts-node/register test/integration/**/*.spec.ts",
+    "integration-test-local": "npm run start-local-ddb && npm run create-local-ddb-tables && npm run integration-test && npm run stop-local-ddb"
   },
   "devDependencies": {
     "@anatine/zod-mock": "^3.13.3",
@@ -20,6 +25,7 @@
     "@faker-js/faker": "^8.3.1",
     "@types/aws-lambda": "^8.10.131",
     "@types/chai": "^4.3.11",
+    "@types/faker": "^6.6.9",
     "@types/mocha": "^10.0.6",
     "@types/node": "20.10.4",
     "@types/sinon": "^17.0.2",

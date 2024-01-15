@@ -1,17 +1,11 @@
 ### Manual Backend Deploy
 
 ```
+cd backend
 npx cdk deploy
 ```
 
-### Todo
-
-- test datafetcher api (use zod create random)
-- add typing to the DB in/out layer
-- test db repository
-- write service layer for data collector
-
-### To run locally
+### DEPRECATED: running locally with localstack
 
 #### dependencies
 
@@ -28,37 +22,26 @@ npm install -g aws-cdk-local aws-cdk
 install sam
 https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html
 
-### running locally
+NOTE: this no longer works because of the use of API Gateway V2 HTTP API - this is only supported with the paid
+localstack pro version. Maintaining this documentation in case that changes.
 
-in one terminal
+in one terminal (note: docker-compose file was renamed deprecated-localstack-docker-compose)
 
 ```
 cd backend
 docker-compose up
 ```
 
-in another terminal, back at root
-
-```
-cdklocal deploy CongressionalAppBackendStack
-```
-
-The first time that runs, you will get an error
-Deployment failed: Error: CongressionalAppBackendStack: SSM parameter /cdk-bootstrap/hnb659fds/version not found...
-
-if you get that
+in another terminal
 
 ```
 cdklocal bootstrap
-```
-
-run this again
-
-```
 cdklocal deploy CongressionalAppBackendStack
 ```
 
-to make sure it's all connected
+^^ note to enhance - set to autoapprove
+
+make sure it's all connected
 
 ```
 awslocal dynamodb list-tables
@@ -66,7 +49,7 @@ awslocal dynamodb list-tables
 
 should see output of tables from our cdk
 
-to invoke lambdal
+to invoke lambda
 
 ```
 sam local invoke -t cdk.out/CongressionalAppBackendStack.template.json

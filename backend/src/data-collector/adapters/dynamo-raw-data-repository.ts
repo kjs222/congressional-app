@@ -9,7 +9,13 @@ import { Chamber, LastVoteReceived } from "../../types";
 import { ddbLatestSchema } from "../../types/ddb-schemas";
 
 export class DynamoRawDataRepository implements RawDataRepository {
-  private readonly client = new DynamoDBClient({ region: "us-east-1" });
+  private readonly client =
+    process.env.NODE_ENV === "test"
+      ? new DynamoDBClient({
+          region: "localhost",
+          endpoint: "http://localhost:8000",
+        })
+      : new DynamoDBClient({ region: "us-east-1" });
   private readonly docClient = DynamoDBDocumentClient.from(this.client);
   private readonly tableName = "congressDataCollectorRaw";
 
@@ -93,5 +99,25 @@ export class DynamoRawDataRepository implements RawDataRepository {
       console.error(parsed.error);
       throw new Error("Error parsing last vote received");
     }
+  }
+
+  async getRawVote(
+    batchId: string,
+    chamber: Chamber,
+    rollCall: number
+  ): Promise<any | null> {
+    const command = new GetItemCommand({
+      TableName: this.tableName,
+      Key: {
+        part: { S: batchId },
+        sort: { S: `${chamber}-${rollCall.toString()}` },
+      },
+    });
+    const response = await this.docClient.send(command);
+    const item = response.Item;
+
+    if (!item) return null;
+
+    return JSON.parse(item.raw.S as string);
   }
 }
