@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { VoteOverview, VoteSummary } from "../../types/vote.types";
-
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardHeader from '@mui/material/CardHeader';
+import Typography from '@mui/material/Typography';
 
 const VoteDetail: React.FC<{ item: VoteOverview}> = (item) => {
   const id = item.item.id;
@@ -26,16 +29,31 @@ const VoteDetail: React.FC<{ item: VoteOverview}> = (item) => {
   
   const header = `${item.item.question}:  ${item.item.result}`
   return (
-    <div>
-      <h1>Vote Detail</h1>
-      <h3>{header}</h3>
-      <p>{item.item.description}</p>
-      <p>Yes: {summary.totalYes} ({summary.percentYes}%)</p>
-      <p>No: {summary.totalNo} ({summary.percentNo}%)</p>
-      <p>Democratic position: {summary.democraticPosition}</p>
-      <p>Republican position: {summary.republicanPosition}</p>
 
-    </div>
+    <Card variant="outlined">
+      <CardHeader title={header} />
+      <CardContent>
+        <Typography variant="body1">
+          {item.item.description}
+        </Typography>
+
+        <Typography variant="body2">
+          Yes: {summary.totalYes} ({summary.percentYes}%)
+        </Typography>
+
+        <Typography variant="body2">
+          No: {summary.totalNo} ({summary.percentNo}%)  
+        </Typography>
+
+        <Typography variant="body2">
+          Democratic position: {summary.democraticPosition}
+        </Typography>
+
+        <Typography variant="body2">
+          Republican position: {summary.republicanPosition}
+        </Typography>
+      </CardContent>
+    </Card>
   )
   };
 

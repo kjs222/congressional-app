@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { VoteCard } from '../../VoteCard';
+import { Typography } from '@mui/material';
 
 const HouseList: React.FC = () => {
   const [votes, setVotes] = useState([]);
@@ -21,6 +22,7 @@ const HouseList: React.FC = () => {
 
   return (
     <div>
+      <Typography variant="h4">Recent House Votes</Typography>
       {votes.map((item: any) => (
         <VoteCard key={item.rollCall} item={item} />
       ))}
