@@ -32,6 +32,7 @@ jobs:
         with:
           aws-access-key-id: fake
           aws-secret-access-key: fake
+          aws-region: us-east-1
       - uses: actions/checkout@v2
       - name: Install dependencies
         run: |
