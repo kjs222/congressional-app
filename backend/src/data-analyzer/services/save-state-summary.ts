@@ -1,6 +1,7 @@
 import { StateVoteWithId } from "../../types/analyzed-data-schemas";
 import { VoteWithPosition } from "../../types/propublica-schemas";
 import { AnalyzedVoteRepository } from "../ports/analyzed-vote-repository";
+import logger from "../../logger";
 
 export const saveStateSummary = async (
   state: string,
@@ -34,7 +35,7 @@ export const saveStateSummary = async (
       }
 
       if (!acc[positionVote]) {
-        console.log(`unexpected positionVote for state ${state}`, positionVote);
+        logger.warn(`unexpected positionVote for state ${state}`, positionVote);
       } else {
         acc[positionVote].push({ name: position.name, party: position.party });
       }

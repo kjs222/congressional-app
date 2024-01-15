@@ -3,6 +3,7 @@ import { RecentVote, VoteResult } from "../../types/propublica-schemas";
 import { AnalyzerMessageSender } from "../ports/analyzer-message-sender";
 import { RawDataRepository } from "../ports/raw-data-repository";
 import { VoteFetcher } from "../ports/vote-fetcher";
+import logger from "../../logger";
 
 export const collectAndSaveData = async (
   repo: RawDataRepository,
@@ -10,8 +11,8 @@ export const collectAndSaveData = async (
   analyzerMessageSender: AnalyzerMessageSender
 ) => {
   const batchId = new Date().getTime().toString();
-  console.log(`Starting batch ${batchId}`);
-  console.log("Collecting house votes");
+  logger.info(`Starting batch ${batchId}`);
+  logger.info("Collecting house votes");
   const houseVotes = await collectAndSaveDataForChamber(
     batchId,
     "house",
@@ -19,8 +20,8 @@ export const collectAndSaveData = async (
     fetcher,
     analyzerMessageSender
   );
-  console.log(`Processed ${houseVotes} house votes`);
-  console.log("Collecting senate votes");
+  logger.info(`Processed ${houseVotes} house votes`);
+  logger.info("Collecting senate votes");
   const senateVotes = await collectAndSaveDataForChamber(
     batchId,
     "senate",
@@ -28,7 +29,7 @@ export const collectAndSaveData = async (
     fetcher,
     analyzerMessageSender
   );
-  console.log(`Processed ${senateVotes} senate votes`);
+  logger.info(`Processed ${senateVotes} senate votes`);
 };
 
 const collectAndSaveDataForChamber = async (
@@ -44,7 +45,7 @@ const collectAndSaveDataForChamber = async (
     lastVoteReceived,
     fetcher
   );
-  console.log(`Found ${recentVoteData.length} new votes for ${chamber}`);
+  logger.info(`Found ${recentVoteData.length} new votes for ${chamber}`);
   if (recentVoteData.length === 0) return null;
   const { roll_call, date } = recentVoteData[0];
   const votes = await batchGetVotes(recentVoteData, fetcher);
@@ -56,13 +57,13 @@ const collectAndSaveDataForChamber = async (
       rawVote: vote.votes.vote,
     };
   });
-  console.log(`Saving ${rawVoteInputs.length} votes for ${chamber}`);
+  logger.info(`Saving ${rawVoteInputs.length} votes for ${chamber}`);
   await repo.saveRawVotes(rawVoteInputs);
-  console.log(`Saving last vote received for ${chamber}`);
+  logger.info(`Saving last vote received for ${chamber}`);
   await repo.saveLastVoteReceived(batchId, chamber, roll_call, date);
 
   for (const input of rawVoteInputs) {
-    console.log(
+    logger.info(
       `Sending message for ${input.batchId} ${input.chamber}-${input.rollCall}`
     );
     await analyzerMessageSender.send({

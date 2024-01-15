@@ -4,9 +4,15 @@ import { z } from "zod";
 import { AnalyzedVoteRepository } from "../ports/analyzed-vote-repository";
 import { VoteOverviewWithId } from "../../types/analyzed-data-schemas";
 import { voteOverviewWithIdSchema } from "../../types/analyzed-data-schemas";
-
+import logger from "../../logger";
 export class DynamoAnalyzedVoteRepository implements AnalyzedVoteRepository {
-  private readonly client = new DynamoDBClient({ region: "us-east-1" });
+  private readonly client =
+    process.env.NODE_ENV === "test"
+      ? new DynamoDBClient({
+          region: "localhost",
+          endpoint: "http://localhost:8000",
+        })
+      : new DynamoDBClient({ region: "us-east-1" });
   private readonly docClient = DynamoDBDocumentClient.from(this.client);
   private readonly tableName = "congressAnalyzedVotes";
 
@@ -24,8 +30,7 @@ export class DynamoAnalyzedVoteRepository implements AnalyzedVoteRepository {
       },
     });
 
-    const response = await this.docClient.send(command);
-    console.log(JSON.stringify(response));
+    await this.docClient.send(command);
     return;
   }
 
@@ -45,8 +50,7 @@ export class DynamoAnalyzedVoteRepository implements AnalyzedVoteRepository {
         lastVote: voteList[0].date,
       },
     });
-    const response = await this.docClient.send(command);
-    console.log(JSON.stringify(response));
+    await this.docClient.send(command);
     return;
   }
 
@@ -75,7 +79,9 @@ export class DynamoAnalyzedVoteRepository implements AnalyzedVoteRepository {
     if (parsed.success) {
       return parsed.data;
     } else {
-      console.error(parsed.error);
+      logger.error("Error parsing response in getVoteList", {
+        error: parsed.error,
+      });
       throw new Error("Error parsing last vote received");
     }
   }

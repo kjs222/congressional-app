@@ -1,8 +1,6 @@
 import { DynamoAnalyzedVoteRepository } from "../adapters/dynamo-analyzed-vote-repository";
 
 export const handler = async (_event: any = {}): Promise<any> => {
-  console.log("event", _event);
-
   const headers = {
     "Access-Control-Allow-Origin":
       "http://kjs222-congressional-application.s3-website-us-east-1.amazonaws.com",

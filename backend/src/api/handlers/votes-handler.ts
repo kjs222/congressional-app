@@ -6,8 +6,6 @@ export const handler = async (_event: any = {}): Promise<any> => {
     "Access-Control-Allow-Credentials": true,
   };
 
-  console.log("event", _event);
-
   const queryStringParameters = _event.queryStringParameters || {};
   if (!queryStringParameters.chamber) {
     return { statusCode: 400, headers, body: "Missing chamber" };
@@ -21,7 +19,6 @@ export const handler = async (_event: any = {}): Promise<any> => {
 
   const repo = new DynamoAnalyzedVoteRepository();
   const data = await repo.getVotes(chamber);
-  console.log("data", data);
   return {
     statusCode: 200,
     headers,

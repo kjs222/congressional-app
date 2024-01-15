@@ -7,9 +7,16 @@ import { PutCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { RawDataRepository, RawVoteInput } from "../ports/raw-data-repository";
 import { Chamber, LastVoteReceived } from "../../types";
 import { ddbLatestSchema } from "../../types/ddb-schemas";
+import logger from "../../logger";
 
 export class DynamoRawDataRepository implements RawDataRepository {
-  private readonly client = new DynamoDBClient({ region: "us-east-1" });
+  private readonly client =
+    process.env.NODE_ENV === "test"
+      ? new DynamoDBClient({
+          region: "localhost",
+          endpoint: "http://localhost:8000",
+        })
+      : new DynamoDBClient({ region: "us-east-1" });
   private readonly docClient = DynamoDBDocumentClient.from(this.client);
   private readonly tableName = "congressDataCollectorRaw";
 
@@ -37,8 +44,7 @@ export class DynamoRawDataRepository implements RawDataRepository {
           congressDataCollectorRaw: batch,
         },
       });
-      const response = await this.docClient.send(command);
-      console.log(JSON.stringify(response));
+      await this.docClient.send(command);
       await new Promise((resolve) => setTimeout(resolve, 2000));
     }
     return;
@@ -60,8 +66,7 @@ export class DynamoRawDataRepository implements RawDataRepository {
         batchId,
       },
     });
-    const response = await this.docClient.send(command);
-    console.log(JSON.stringify(response));
+    await this.docClient.send(command);
     return { batchId, chamber };
   }
 
@@ -90,8 +95,30 @@ export class DynamoRawDataRepository implements RawDataRepository {
         chamber,
       };
     } else {
-      console.error(parsed.error);
+      logger.error("Error parsing response in getLastVoteReceived", {
+        error: parsed.error,
+      });
       throw new Error("Error parsing last vote received");
     }
+  }
+
+  async getRawVote(
+    batchId: string,
+    chamber: Chamber,
+    rollCall: number
+  ): Promise<any | null> {
+    const command = new GetItemCommand({
+      TableName: this.tableName,
+      Key: {
+        part: { S: batchId },
+        sort: { S: `${chamber}-${rollCall.toString()}` },
+      },
+    });
+    const response = await this.docClient.send(command);
+    const item = response.Item;
+
+    if (!item) return null;
+
+    return JSON.parse(item.raw.S as string);
   }
 }
