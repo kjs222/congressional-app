@@ -4,12 +4,6 @@ on:
     branches:
       - main
 
-services:
-  dynamodb:
-    image: amazon/dynamodb-local
-    ports:
-      - 8000:8000
-
 jobs:
   check-code-changes:
     runs-on: ubuntu-latest
@@ -41,6 +35,13 @@ jobs:
     needs: check-code-changes
     runs-on: ubuntu-latest
     if: ${{ steps.code_changes.outputs.backend-changes != '' }}
+
+    services:
+      dynamodb:
+        image: amazon/dynamodb-local
+        ports:
+          - 8000:8000
+
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
