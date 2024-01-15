@@ -46,7 +46,7 @@ describe("DynamoRawDataRepository", () => {
   });
 
   describe("saveRawVote", () => {
-    it.only("should return the expected response on a successful call", async () => {
+    it("should return the expected response on a successful call", async () => {
       const repo = new DynamoRawDataRepository();
       const batchId = simpleFaker.string.alphanumeric(10);
       const chamber = simpleFaker.string.alphanumeric(10) as Chamber;
