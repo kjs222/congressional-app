@@ -29,16 +29,6 @@ const VoteDetail: React.FC<{ item: VoteOverview}> = (item) => {
   
   const header = `${item.item.question}:  ${item.item.result}`
   return (
-    // <div>
-    //   <h1>Vote Detail</h1>
-    //   <h3>{header}</h3>
-    //   <p>{item.item.description}</p>
-    //   <p>Yes: {summary.totalYes} ({summary.percentYes}%)</p>
-    //   <p>No: {summary.totalNo} ({summary.percentNo}%)</p>
-    //   <p>Democratic position: {summary.democraticPosition}</p>
-    //   <p>Republican position: {summary.republicanPosition}</p>
-
-    // </div>
 
     <Card variant="outlined">
       <CardHeader title={header} />
