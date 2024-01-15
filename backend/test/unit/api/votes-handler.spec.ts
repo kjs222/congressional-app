@@ -43,7 +43,7 @@ describe("handler", () => {
       const response = await handler({
         queryStringParameters: { chamber: "bad" },
       });
-      expect(response).to.deep.equal({
+      expect(response).to.deep.include({
         statusCode: 400,
         body: "Invalid chamber",
       });

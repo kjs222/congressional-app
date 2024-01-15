@@ -27,6 +27,11 @@ jobs:
           - 8000:8000
 
     steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: fake
+          aws-secret-access-key: fake
       - uses: actions/checkout@v2
       - name: Install dependencies
         run: |
