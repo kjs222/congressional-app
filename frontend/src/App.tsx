@@ -1,14 +1,13 @@
-import './App.css';
-import VoteList from './VoteList';
+import "./App.css";
+import { HashRouter } from 'react-router-dom';
+import Router from "./pages/router";
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <VoteList />
-      </header>
-    </div>
+    <HashRouter>
+      <Router />
+    </HashRouter>
   );
-}
+};
 
 export default App;

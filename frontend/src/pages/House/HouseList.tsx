@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { VoteCard } from './VoteCard';
+import { VoteCard } from '../../VoteCard';
 
-const VoteList: React.FC = () => {
+const HouseList: React.FC = () => {
   const [votes, setVotes] = useState([]);
 
   useEffect(() => {
@@ -29,5 +29,5 @@ const VoteList: React.FC = () => {
 
 };
 
-export default VoteList;
+export default HouseList;
 

@@ -151,6 +151,15 @@ export class CongressionalAppBackendStack extends cdk.Stack {
 
     const api = new apigateway.HttpApi(this, "VotesApi", {
       apiName: "Votes API",
+      corsPreflight: {
+        allowOrigins: [
+          "http://kjs222-congressional-application.s3-website-us-east-1.amazonaws.com",
+          "http://localhost:3000",
+        ],
+        allowMethods: [apigateway.CorsHttpMethod.GET],
+        allowHeaders: ["*"],
+        allowCredentials: true,
+      },
     });
 
     const votesIntegration = new HttpLambdaIntegration(

@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { VoteCard } from './VoteCard';
+import { VoteCard } from '../../VoteCard';
 
-const VoteList: React.FC = () => {
+const HouseList: React.FC = () => {
   const [votes, setVotes] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       const baseURL = process.env.REACT_APP_API_URL;
       try {
-        const response = await fetch(baseURL + '/votes?chamber=house');
+        const response = await fetch(baseURL + '/votes?chamber=senate');
         const data = await response.json();
         setVotes(data.data); 
       } catch (error) {
@@ -29,5 +29,5 @@ const VoteList: React.FC = () => {
 
 };
 
-export default VoteList;
+export default HouseList;
 

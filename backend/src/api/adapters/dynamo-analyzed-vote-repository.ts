@@ -11,11 +11,11 @@ import {
   StateVote,
   VoteOverview,
   VoteSummary,
-  partyVoteSchema,
-  stateVoteSchema,
-  voteSummarySchema,
+  partyVoteWithIdSchema,
+  stateVoteWithIdSchema,
+  voteSummaryWithIdSchema,
+  voteOverviewWithIdSchema,
 } from "../../types/analyzed-data-schemas";
-import { voteOverviewSchema } from "../../types/analyzed-data-schemas";
 import { Chamber } from "../../types";
 
 export class DynamoAnalyzedVoteRepository implements AnalyzedVoteRepository {
@@ -36,9 +36,8 @@ export class DynamoAnalyzedVoteRepository implements AnalyzedVoteRepository {
 
     if (!item) return null;
     const toJson = JSON.parse(item.analysis.S?.toString() || "{}");
-    console.log("toJson", toJson);
 
-    const schema = voteSummarySchema;
+    const schema = voteSummaryWithIdSchema;
 
     const parsed = schema.safeParse(toJson);
 
@@ -67,7 +66,7 @@ export class DynamoAnalyzedVoteRepository implements AnalyzedVoteRepository {
     if (!item) return null;
     const toJson = JSON.parse(item.analysis.S?.toString() || "{}");
 
-    const schema = stateVoteSchema;
+    const schema = stateVoteWithIdSchema;
 
     const parsed = schema.safeParse(toJson);
 
@@ -96,7 +95,7 @@ export class DynamoAnalyzedVoteRepository implements AnalyzedVoteRepository {
     if (!item) return null;
     const toJson = JSON.parse(item.analysis.S?.toString() || "{}");
 
-    const schema = partyVoteSchema;
+    const schema = partyVoteWithIdSchema;
 
     const parsed = schema.safeParse(toJson);
 
@@ -131,7 +130,7 @@ export class DynamoAnalyzedVoteRepository implements AnalyzedVoteRepository {
 
     if (!items || !items.length) return [];
 
-    const schema = z.array(voteOverviewSchema);
+    const schema = z.array(voteOverviewWithIdSchema);
     // to do: add an id on this...
     const toJson = items
       .map((item) => {

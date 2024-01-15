@@ -38,6 +38,10 @@ export const voteSummarySchema = z.object({
   republicanPosition: z.string(),
 });
 
+export const voteSummaryWithIdSchema = voteSummarySchema.extend({
+  id: z.string(),
+});
+
 export const voteSummaryRecordSchema = z.object({
   part: z.string(), // "<congress>-<chamber>-<session>-<rollCall>"
   sort: z.string(), // "summary"
@@ -58,6 +62,10 @@ export const partyVoteSchema = z.object({
   noVoters: z.array(z.string()),
   notVoting: z.array(z.string()),
   presentVoters: z.array(z.string()),
+});
+
+export const partyVoteWithIdSchema = partyVoteSchema.extend({
+  id: z.string(),
 });
 
 export const partyVoteRecordSchema = z.object({
@@ -83,6 +91,10 @@ export const stateVoteSchema = z.object({
   noIndependentVoters: z.array(z.string()),
   presentVoters: z.array(z.string()),
   notVoting: z.array(z.string()),
+});
+
+export const stateVoteWithIdSchema = stateVoteSchema.extend({
+  id: z.string(),
 });
 
 export const stateVoteRecordSchema = z.object({
