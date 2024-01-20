@@ -4,9 +4,12 @@ export interface VoteOverview {
   congress: string;
   rollCall: string;
   session: string;
+  date: string;
   description: string;
   question: string;
   result: string;
+  url: string;
+  billTitle?: string;
 }
 
 export interface VoteSummary {
@@ -20,4 +23,20 @@ export interface VoteSummary {
   percentYes: number;
   percentNo: number;
   result: string;
+}
+
+export interface PartyVote {
+  party: string;
+  totalYes: number;
+  totalNo: number;
+  totalNotVoting: number;
+  totalPresent: number;
+  percentYes: number;
+  percentNo: number;
+  position: string;
+  percentVoteWithParty: number | null;
+  yesVoters: string[];
+  noVoters: string[];
+  notVoting: string[];
+  presentVoters: string[];
 }
