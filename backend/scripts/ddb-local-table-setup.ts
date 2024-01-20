@@ -28,7 +28,7 @@ const rawTableParams = {
 };
 
 const analyzedTableParams = {
-  TableName: "congressDataAnalyzer",
+  TableName: "congressAnalyzedVotes",
   KeySchema: [
     { AttributeName: "part", KeyType: "HASH" },
     { AttributeName: "sort", KeyType: "RANGE" },
