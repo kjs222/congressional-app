@@ -5,6 +5,12 @@ import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import Typography from '@mui/material/Typography';
 
+import Accordion from '@mui/material/Accordion';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { PartyDetail } from "../../PartyDetail";
+
 const VoteDetail: React.FC<{ item: VoteOverview}> = (item) => {
   const id = item.item.id;
 
@@ -36,22 +42,56 @@ const VoteDetail: React.FC<{ item: VoteOverview}> = (item) => {
         <Typography variant="body1">
           {item.item.description}
         </Typography>
+        <Accordion defaultExpanded>
+          <AccordionSummary
+            expandIcon={<ArrowDropDownIcon />}
+            aria-controls="panel1-content"
+            id="panel1-header"
+          >
+            <Typography>Summary</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Typography variant="body2">
+              Yes: {summary.totalYes} ({summary.percentYes}%)
+            </Typography>
 
-        <Typography variant="body2">
-          Yes: {summary.totalYes} ({summary.percentYes}%)
-        </Typography>
+            <Typography variant="body2">
+              No: {summary.totalNo} ({summary.percentNo}%)  
+            </Typography>
 
-        <Typography variant="body2">
-          No: {summary.totalNo} ({summary.percentNo}%)  
-        </Typography>
+            <Typography variant="body2">
+              Democratic position: {summary.democraticPosition}
+            </Typography>
 
-        <Typography variant="body2">
-          Democratic position: {summary.democraticPosition}
-        </Typography>
-
-        <Typography variant="body2">
-          Republican position: {summary.republicanPosition}
-        </Typography>
+            <Typography variant="body2">
+              Republican position: {summary.republicanPosition}
+            </Typography>
+          </AccordionDetails>
+        </Accordion>
+        <Accordion>
+          <AccordionSummary
+            expandIcon={<ArrowDropDownIcon />}
+            aria-controls="panel2-content"
+            id="panel2-header"
+          >
+            <Typography>Democratic</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <PartyDetail id={id} party="democratic" />
+          </AccordionDetails>
+        </Accordion>
+        <Accordion>
+          <AccordionSummary
+            expandIcon={<ArrowDropDownIcon />}
+            aria-controls="panel2-content"
+            id="panel2-header"
+          >
+            <Typography>Republican</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <PartyDetail id={id} party="republican" />
+          </AccordionDetails>
+        </Accordion>
       </CardContent>
     </Card>
   )
