@@ -6,7 +6,6 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 import { VoteOverview } from './types/vote.types';
-import Link from '@mui/material/Link';
 import EventIcon from '@mui/icons-material/Event';
 
 export const VoteCard: React.FC<{ item: VoteOverview}> = ({ item }) => {
