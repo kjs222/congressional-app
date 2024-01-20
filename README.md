@@ -2,6 +2,10 @@
 
 It may be easiest to read this README (with images) on Github: https://github.com/kjs222/congressional-app
 
+### Overview
+
+This application queries the ProPublica API daily for new senate and house votes. It does analysis on the recent votes and provides a front end application to display that information.
+
 ## Tech Stack
 
 - React Typescript frontend
@@ -43,6 +47,7 @@ I chose a no SQL database for a variety of reasons:
 - Deployed on: AWS Lambda (serverless)
 - Invoked by: Scheduled AWS Event Bridge Event
 - Code path: backend/src/data-collector
+- Entry point: handler function in `backend/src/data-collector/handler.ts`
 
 Purpose:
 
@@ -59,6 +64,7 @@ To effectively decouple the data collector for the data analyzer (and allow them
 - Deployed on: AWS Lambda (serverless)
 - Invoked by: SQS Event
 - Code path: backend/src/data-analyzer
+- Entry point: handler function in `backend/src/data-analyzer/handler.ts`
 
 Purpose:
 
@@ -70,6 +76,7 @@ Purpose:
 - Deployed on: AWS Lambda (serverless) with AWS API Gateway (routing, etc)
 - Invoked by: HTTP API
 - Code path: backend/src/api
+- Entry point: handler function in each file in the directory `backend/src/api/handlers`
 
 Purpose:
 
@@ -189,3 +196,10 @@ npm run start-local-ddb
 ```
 
 I am not exposing the env variables needed to actually run the application however (sorry)
+
+#### Next features to add
+
+I added an MVP frontend, but I would minimally like to add the following:
+
+- A way to scroll to get more votes (right now it is just retrieving the last 20)
+- A way to display vote analysis by the state of the member (this data exists on the backend, but hasn't been exposed on the frontend)

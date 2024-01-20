@@ -28,9 +28,6 @@ export const VoteCard: React.FC<{ item: VoteOverview}> = ({ item }) => {
         <Typography variant="body2">
           {item.description}
         </Typography>
-        <Typography variant="body2">
-          <Link href={item.url}>See on Congressional website</Link>
-        </Typography>
         
         <Button onClick={handleSeeDetails} variant="contained" color="secondary">See Analysis</Button>
       </CardContent>
