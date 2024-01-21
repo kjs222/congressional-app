@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { VoteCard } from '../../VoteCard';
-import { Typography } from '@mui/material';
+import { Typography, CircularProgress } from '@mui/material';
 
 const HouseList: React.FC = () => {
   const [votes, setVotes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -13,12 +15,23 @@ const HouseList: React.FC = () => {
         const data = await response.json();
         setVotes(data.data); 
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching data:', error);  
+        setError('Error fetching data. Please try again.');
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchData();
   }, []); 
+
+  if (loading) {
+    return <CircularProgress />; 
+  }
+
+  if (error) {
+    return <Typography variant="body2" color="error">{error}</Typography>; 
+  }
 
   return (
     <div>
