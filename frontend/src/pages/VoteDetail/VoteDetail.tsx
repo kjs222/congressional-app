@@ -4,6 +4,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -15,6 +16,9 @@ const VoteDetail: React.FC<{ item: VoteOverview}> = (item) => {
   const id = item.item.id;
 
   const [summary, setSummary] = useState({} as VoteSummary);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,6 +30,9 @@ const VoteDetail: React.FC<{ item: VoteOverview}> = (item) => {
         setSummary(received); 
       } catch (error) {
         console.error('Error fetching data:', error);
+        setError('Error fetching data. Please try again.');
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -34,6 +41,15 @@ const VoteDetail: React.FC<{ item: VoteOverview}> = (item) => {
 
   
   const header = `${item.item.question}:  ${item.item.result}`
+
+  if (loading) {
+    return <CircularProgress />; 
+  }
+
+  if (error) {
+    return <Typography variant="body2" color="error">{error}</Typography>; 
+  }
+
   return (
 
     <Card variant="outlined">

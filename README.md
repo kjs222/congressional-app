@@ -2,7 +2,7 @@
 
 It may be easiest to read this README (with images) on Github: https://github.com/kjs222/congressional-app
 
-### Overview
+### Project Overview
 
 This application queries the ProPublica API daily for new senate and house votes. It does analysis on the recent votes and provides a front end application to display that information.
 
@@ -196,6 +196,16 @@ npm run start-local-ddb
 ```
 
 I am not exposing the env variables needed to actually run the application however (sorry)
+
+#### Evolution and Considerations
+
+I chose a serverless application and did not use a framework like Serverless or SAM - for the learning experience.
+
+From my perspective, the application is well-tested despite the limitations of testing scenarios where AWS infrastructure is needed. While LocalStack could have been a solution, some of the AWS services used in this application are not available in the free version of Local Stack.
+
+However, outside of the database integration, which is testing using a docker version of DynamoDB, the AWS interactions are very straightforward (things like: publishing a message to SQS, etc). Further, by using Typescript, it is almost difficult to get this wrong, etc.
+
+I've always struggled a bit with using DynamoDB (as compared to SQL), because it doesn't handle relational data well, and the access patterns can be so limited. For now, it suits my needs.
 
 #### Next features to add
 
